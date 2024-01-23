@@ -63,7 +63,9 @@ public class TestFactory {
         var board = loadBoard(boardText);
         var testPiece = board.getPiece(startPosition);
         var validMoves = loadMoves(startPosition, endPositions);
-
+        System.out.println(board);
+        System.out.println(validMoves);
+        System.out.println(testPiece.pieceMoves(board, startPosition));
         Assertions.assertEquals(validMoves, testPiece.pieceMoves(board, startPosition), "Wrong moves");
     }
 
