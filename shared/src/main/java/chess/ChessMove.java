@@ -24,8 +24,10 @@ ChessMove {
 
     @Override
     public String toString() {
-        return "start=" + startPosition +
-                ", end=" + endPosition;
+            return "startPosition=" + startPosition +
+            ", endPosition=" + endPosition +
+            ", promotionPiece=" + promotionPiece +
+            '}';
     }
 
 //            return "startPosition=" + startPosition +
