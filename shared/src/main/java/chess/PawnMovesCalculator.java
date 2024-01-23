@@ -120,7 +120,6 @@ public class PawnMovesCalculator {
         if ((pieceAtNextPosition.getTeamColor() != board.getPiece(position).getTeamColor()) && promotion == null) {
             validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), null));
         } else if((pieceAtNextPosition.getTeamColor() != board.getPiece(position).getTeamColor()) && promotion != null) {
-            System.out.println("------------------------in else if");
             validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), ChessPiece.PieceType.QUEEN));
             validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), ChessPiece.PieceType.ROOK));
             validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), ChessPiece.PieceType.KNIGHT));
@@ -148,9 +147,6 @@ public class PawnMovesCalculator {
             ChessPiece pieceAtDirectlyInFrontPosition = board.getPiece(new ChessPosition(move.getRow()+1, move.getColumn()));
 
             if (pieceAtNextPosition == null && pieceAtDirectlyInFrontPosition == null) {
-                System.out.println("----------------------------in black if");
-                System.out.println(pieceAtNextPosition);
-
                 // Empty cell, add the move
                 validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), null));
             }
@@ -170,9 +166,6 @@ public class PawnMovesCalculator {
 //    }
     private void calculateMovesInDirection(int row, int col) {
         ChessPosition move = new ChessPosition(position.getRow()+row, position.getColumn()+col);
-        System.out.println("------------------------move" + move);
-        System.out.println("------------------------promotions" + promotionPositions);
-
         ChessPiece.PieceType promotion = null;
         ChessPiece currentPiece = board.getPiece(position);
 
@@ -182,16 +175,13 @@ public class PawnMovesCalculator {
 
 
 
-        System.out.println(board);
         ChessPiece pieceAtNextPosition = board.getPiece(new ChessPosition(move.getRow(), move.getColumn()));
 
         if (pieceAtNextPosition == null && promotion == null) {
             // Empty cell, add the move
-            System.out.println("------------------------in if");
 
             validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), promotion));
         } else if(pieceAtNextPosition == null && promotion != null) {
-            System.out.println("------------------------in else if");
             validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), ChessPiece.PieceType.QUEEN));
             validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), ChessPiece.PieceType.ROOK));
             validMoves.add(new ChessMove(position, new ChessPosition(move.getRow(), move.getColumn()), ChessPiece.PieceType.KNIGHT));
