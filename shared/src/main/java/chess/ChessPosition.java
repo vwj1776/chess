@@ -55,6 +55,9 @@ public class ChessPosition {
             return true;
         }
         ChessPosition chessObj = (ChessPosition) obj;
+        if(chessObj == null) {
+            return false;
+        }
         if(this.row == chessObj.row && this.col == chessObj.col) {
             return true;
         }

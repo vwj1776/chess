@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A chessboard that can hold and rearrange chess pieces.
@@ -12,8 +14,15 @@ public class ChessBoard {
 
     private ChessPiece[][] board = new ChessPiece[8][8];
 
+    private ChessPiece pieceThatItWas;
+
+    private ChessMove lastMove;
     public ChessBoard() {
 
+    }
+
+    public ChessPiece[][] getBoard() {
+        return board;
     }
 
     /**
@@ -77,8 +86,11 @@ public class ChessBoard {
 
 
     public boolean isValidPosition(ChessPosition position) {
-        if(position.getRow()-1 <= 7 && position.getColumn()-1 <= 7 && position.getRow()-1 >= 0 && position.getColumn()-1 >= 0) {
-            return true;
+        if(position != null) {
+            if(position.getRow()-1 <= 7 && position.getColumn()-1 <= 7 && position.getRow()-1 >= 0 && position.getColumn()-1 >= 0) {
+                return true;
+            }
+
         }
         return false;
     }
@@ -136,4 +148,42 @@ public class ChessBoard {
                 "board=" + Arrays.deepToString(board) +
                 '}';
     }
+
+    public void makeMove(ChessMove move) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+        pieceThatItWas = getPiece(endPosition);
+        ChessPiece pieceToMove = getPiece(startPosition);
+        addPiece(endPosition, pieceToMove);
+        addPiece(startPosition, null);
+        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+        if (promotionPiece != null && pieceToMove.getPieceType() == ChessPiece.PieceType.PAWN) {
+            ChessPiece promotedPiece = new ChessPiece(pieceToMove.getTeamColor(), promotionPiece);
+            addPiece(endPosition, promotedPiece);
+        }
+        lastMove = move;
+    }
+
+    public void undoLastMove() {
+            //TODO undo make move reverse
+        if(lastMove != null) {
+            ChessPosition startPosition = lastMove.getEndPosition();
+            ChessPosition endPosition = lastMove.getStartPosition();
+            ChessPiece pieceToMove = getPiece(startPosition);
+            ChessPiece undoPromotionPiece = getPiece(lastMove.startPosition);
+            if (undoPromotionPiece != null) {
+                addPiece(endPosition, undoPromotionPiece);
+            } else {
+                addPiece(endPosition, pieceToMove);
+            }
+            addPiece(startPosition, pieceThatItWas); // cant make it null if it was captured, make it the peice it was
+        }
+        lastMove =null;
+    }
+
+    public ChessMove getLastMove() {
+        return lastMove;
+    }
+
+
 }
