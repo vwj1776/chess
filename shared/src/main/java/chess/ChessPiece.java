@@ -55,10 +55,10 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-//        if(getPieceType() == PieceType.BISHOP) {
-//            BishopMovesCalculator validMoves = new BishopMovesCalculator(board, myPosition);
-//            return validMoves.calculateValidMoves();
-//        }
+        if(getPieceType() == PieceType.BISHOP) {
+            BishopMovesCalculator validMoves = new BishopMovesCalculator(board, myPosition);
+            return validMoves.calculateValidMoves();
+        }
 //        if(getPieceType() == PieceType.ROOK) {
 //            RookMovesCalculator validMoves = new RookMovesCalculator(board, myPosition);
 //            return validMoves.calculateValidMoves();
