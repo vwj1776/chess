@@ -59,10 +59,10 @@ public class ChessPiece {
             BishopMovesCalculator validMoves = new BishopMovesCalculator(board, myPosition);
             return validMoves.calculateValidMoves();
         }
-//        if(getPieceType() == PieceType.ROOK) {
-//            RookMovesCalculator validMoves = new RookMovesCalculator(board, myPosition);
-//            return validMoves.calculateValidMoves();
-//        }
+        if(getPieceType() == PieceType.ROOK) {
+            RookMovesCalculator validMoves = new RookMovesCalculator(board, myPosition);
+            return validMoves.calculateValidMoves();
+        }
         if(getPieceType() == PieceType.QUEEN) {
             QueenMovesCalculator validMoves = new QueenMovesCalculator(board, myPosition);
             return validMoves.calculateValidMoves();
