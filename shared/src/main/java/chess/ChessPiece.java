@@ -71,10 +71,10 @@ public class ChessPiece {
             KnightMovesCalculator validMoves = new KnightMovesCalculator(board, myPosition);
             return validMoves.calculateValidMoves();
         }
-//        if(getPieceType() == PieceType.PAWN) {
-//            PawnMovesCalculator validMoves = new PawnMovesCalculator(board, myPosition);
-//            return validMoves.calculateValidMoves();
-//        }
+        if(getPieceType() == PieceType.PAWN) {
+            PawnMovesCalculator validMoves = new PawnMovesCalculator(board, myPosition);
+            return validMoves.calculateValidMoves();
+        }
         if(getPieceType() == PieceType.KING) {
             KingMovesCalculator validMoves = new KingMovesCalculator(board, myPosition);
             return validMoves.calculateValidMoves();
