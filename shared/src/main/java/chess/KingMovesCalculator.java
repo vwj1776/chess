@@ -10,6 +10,9 @@ public class KingMovesCalculator {
     private Set<ChessMove> movesGoingToCheck;
 
 
+
+
+    // just a test
     public KingMovesCalculator(ChessBoard board, ChessPosition position) {
         this.board = board;
         this.position = position;
