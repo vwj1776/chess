@@ -37,15 +37,15 @@ public class KingMovesCalculator {
 
     private void calculateMovesGoingToCheck() {
         BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator(board, position);
-        KnightMovesCalculator knightMovesCalculator = new KnightMovesCalculator(board, position);
-        PawnMovesCalculator pawnMovesCalculator = new PawnMovesCalculator(board, position);
-        QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator(board, position);
-        RookMovesCalculator rookMovesCalculator = new RookMovesCalculator(board, position);
-        movesGoingToCheck.addAll(bishopMovesCalculator.calculateValidMoves());
-        movesGoingToCheck.addAll(knightMovesCalculator.calculateValidMoves());
-        movesGoingToCheck.addAll(pawnMovesCalculator.calculateValidMoves());
-        movesGoingToCheck.addAll(queenMovesCalculator.calculateValidMoves());
-        movesGoingToCheck.addAll(rookMovesCalculator.calculateValidMoves());
+//        KnightMovesCalculator knightMovesCalculator = new KnightMovesCalculator(board, position);
+//        PawnMovesCalculator pawnMovesCalculator = new PawnMovesCalculator(board, position);
+//        QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator(board, position);
+//        RookMovesCalculator rookMovesCalculator = new RookMovesCalculator(board, position);
+//        movesGoingToCheck.addAll(bishopMovesCalculator.calculateValidMoves());
+//        movesGoingToCheck.addAll(knightMovesCalculator.calculateValidMoves());
+//        movesGoingToCheck.addAll(pawnMovesCalculator.calculateValidMoves());
+//        movesGoingToCheck.addAll(queenMovesCalculator.calculateValidMoves());
+//        movesGoingToCheck.addAll(rookMovesCalculator.calculateValidMoves());
     }
 
     private void calculateMoves() {
