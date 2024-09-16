@@ -55,4 +55,19 @@ public class ChessPiece {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         throw new RuntimeException("Not implemented");
     }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        if(pieceColor == ChessGame.TeamColor.BLACK) {
+            str.append(pieceType.toString().charAt(0));
+            return str.toString().toLowerCase();
+
+        }
+        if(pieceColor == ChessGame.TeamColor.WHITE) {
+            str.append(pieceType.toString().charAt(0));
+            return str.toString().toUpperCase();
+        }
+        return "nothing";
+    }
 }
