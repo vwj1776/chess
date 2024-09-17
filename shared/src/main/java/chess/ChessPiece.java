@@ -59,6 +59,9 @@ public class ChessPiece {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
+        if(this == null){
+            str.append("null");
+        }
         if(pieceColor == ChessGame.TeamColor.BLACK) {
             str.append(pieceType.toString().charAt(0));
             return str.toString().toLowerCase();
