@@ -56,4 +56,11 @@ public class ChessPosition {
         return ((ChessPosition) obj).col == this.col && ((ChessPosition) obj).row == this.row;
     }
 
+    @Override
+    public String toString() {
+        return "{" +
+                "row=" + row +
+                ", col=" + col +
+                '}';
+    }
 }

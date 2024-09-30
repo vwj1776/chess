@@ -14,7 +14,7 @@ public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-        resetBoard();
+
     }
 
     /**
@@ -164,5 +164,15 @@ public class ChessBoard {
                 }
             }
         }
+    }
+
+    public boolean isValidPosition(ChessPosition position) {
+        if(position != null) {
+            if(position.getRow()-1 <= 7 && position.getColumn()-1 <= 7 && position.getRow()-1 >= 0 && position.getColumn()-1 >= 0) {
+                return true;
+            }
+
+        }
+        return false;
     }
 }

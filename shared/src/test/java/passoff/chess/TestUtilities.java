@@ -11,13 +11,20 @@ import java.util.Set;
 public class TestUtilities {
     static public void validateMoves(String boardText, ChessPosition startPosition, int[][] endPositions) {
         var board = loadBoard(boardText);
+        System.out.println(board);
         var testPiece = board.getPiece(startPosition);
         var validMoves = loadMoves(startPosition, endPositions);
+        System.out.println("validMoves" + validMoves);
+        System.out.println("validMoves.size()" + validMoves.size());
+
         validateMoves(board, testPiece, startPosition, validMoves);
     }
 
     static public void validateMoves(ChessBoard board, ChessPiece testPiece, ChessPosition startPosition, Set<ChessMove> validMoves) {
         var pieceMoves = new HashSet<>(testPiece.pieceMoves(board, startPosition));
+        System.out.println("pieceMoves" + pieceMoves);
+        System.out.println("pieceMoves.size()" + pieceMoves.size());
+
         assertCollectionsEquals(validMoves, pieceMoves, "Wrong moves");
     }
 

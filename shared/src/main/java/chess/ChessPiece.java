@@ -55,9 +55,30 @@ public class ChessPiece {
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
         Collection<ChessMove> moves = new ArrayList<ChessMove>();
-        ChessPiece myPositionPiece = board.getPiece(myPosition);
-        System.out.println("myPositionPiece" + myPositionPiece);
-        System.out.println("this" + this);
+        if(this.pieceType.equals(PieceType.BISHOP)){
+            BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator(board, myPosition);
+            moves = bishopMovesCalculator.getValidMoves();
+        }
+        if(this.pieceType.equals(PieceType.ROOK)){
+            RookMovesCalculator rookMovesCalculator = new RookMovesCalculator(board, myPosition);
+            moves = rookMovesCalculator.getValidMoves();
+        }
+        if(this.pieceType.equals(PieceType.QUEEN)){
+            QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator(board, myPosition);
+            moves = queenMovesCalculator.getValidMoves();
+        }
+        if(this.pieceType.equals(PieceType.KING)){
+            KingMovesCalculator kingMovesCalculator = new KingMovesCalculator(board, myPosition);
+            moves = kingMovesCalculator.getValidMoves();
+        }
+        if(this.pieceType.equals(PieceType.KNIGHT)){
+            KnightMovesCalculator knightMovesCalculator = new KnightMovesCalculator(board, myPosition);
+            moves = knightMovesCalculator.getValidMoves();
+        }
+        if(this.pieceType.equals(PieceType.PAWN)){
+            PawnMovesCalculator pawnMovesCalculator = new PawnMovesCalculator(board, myPosition);
+            moves = pawnMovesCalculator.getValidMoves();
+        }
         return moves;
     }
 
