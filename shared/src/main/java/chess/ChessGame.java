@@ -188,4 +188,41 @@ public class ChessGame {
         // King not found (this should not happen in a valid chess game)
         return null;
     }
+
+    /**
+     * Checks if a specific position on the chessboard is under threat from any opponent pieces.
+     *
+     * @param kingPosition  the position to check
+     * @param opponentColor the color of the opponent team
+     * @return True if the position is under threat
+     */
+    private boolean isUnderThreat(ChessPosition kingPosition, TeamColor opponentColor) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = board.getBoard()[row][col];
+                if (piece != null && piece.getTeamColor() == opponentColor) {
+                    ChessPosition piecePosition = new ChessPosition(row+1, col+1);
+                    ChessPosition pawnPosition = new ChessPosition(6, 5);
+
+                    Set<ChessMove> movesOfAggressor = (Set<ChessMove>) piece.pieceMoves(board, piecePosition);  // Use the piece's move calculator
+                    for (ChessMove move : movesOfAggressor) {
+                        if(piecePosition.equals(pawnPosition)) {
+                            print("found Pawn");
+                        }
+                        if (move.getEndPosition().equals(kingPosition)) {
+                            return true;  // The position is under threat
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;  // The position is not under threat
+    }
+
+    public void print(Object obj) {
+        System.out.println(obj);
+        System.out.println("\n");
+
+    }
 }
