@@ -166,4 +166,26 @@ public class ChessGame {
     public ChessBoard getBoard() {
         return board;
     }
+
+    /**
+     * Finds the position of the king for the specified team.
+     *
+     * @param teamColor which team to find the king for
+     * @return The position of the king
+     */
+    private ChessPosition findKingPosition(TeamColor teamColor) {
+        // Iterate through the chessboard to find the king's position
+
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = board.getBoard()[row][col];
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    return new ChessPosition(row + 1, col + 1);
+                }
+            }
+        }
+        // King not found (this should not happen in a valid chess game)
+        return null;
+    }
 }
