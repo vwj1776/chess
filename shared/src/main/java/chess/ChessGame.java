@@ -14,7 +14,7 @@ public class ChessGame {
 
     //  private Set<ChessMove> validMoves = new HashSet<>();
 
-    private TeamColor turn;
+    private TeamColor turn = TeamColor.WHITE;
 
     private ChessBoard board = new ChessBoard();
 
@@ -380,9 +380,35 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // ChessPosition kingPosition = findKingPosition(teamColor);
-
+        boolean checkmate = false;
         if(isInCheck(teamColor)) {
-            return true;
+            checkmate = true;
+        }
+//        if(canGetOutOfCheckByDeath()){
+//            checkmate = false;
+//        }
+        return checkmate;
+    }
+
+    private boolean canGetOutOfCheckByDeath() {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = board.getBoard()[row][col];
+                if (piece != null && piece.getTeamColor() == getTeamTurn() && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    ChessPosition piecePosition = new ChessPosition(row + 1, col + 1);
+                    Collection<ChessMove> pieceMoves = getPotentialMoves(piecePosition);
+
+                    // If any piece has valid moves, it's not
+                    // make the baskic amove and then check for check
+                    for(ChessMove move: pieceMoves){
+                        board.makeMove(move);
+                        if (!pieceMoves.isEmpty() && !isInCheck(getTeamTurn())) {
+                            return true;
+                        }
+                    }
+
+                }
+            }
         }
         return false;
     }
