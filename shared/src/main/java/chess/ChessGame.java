@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -130,7 +131,46 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPosition = findKingPosition(teamColor);
+        Set<ChessMove> moves = getPotentialMoves(kingPosition);
+
+        moves = removeBadMovesWithoutStalemate(moves);
+        // Check if the king has no valid moves
+        if (moves.size() == 0) {
+            // TeamColor oppositeTeamColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+
+            // Check if any piece (other than the king) has valid moves
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    ChessPiece piece = board.getBoard()[row][col];
+                    if (piece != null && piece.getTeamColor() ==teamColor && piece.getPieceType() != ChessPiece.PieceType.KING) {
+                        ChessPosition piecePosition = new ChessPosition(row + 1, col + 1);
+                        Collection<ChessMove> pieceMoves = getPotentialMoves(piecePosition);
+
+                        // If any piece has valid moves, it's not stalemate
+                        if (!pieceMoves.isEmpty()) {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            // If no piece has valid moves (other than the king), it's stalemate
+            return true;
+        }
+
+        // If the king has valid moves, it's not stalemate
+        return false;
+    }
+
+    public Set<ChessMove> getPotentialMoves(ChessPosition position){
+        Set<ChessMove> validMoves = new HashSet<>();
+        ChessPiece piece = board.getPiece(position);
+        if(piece != null) {
+            validMoves.addAll(piece.pieceMoves(board, position));
+        }
+
+        return validMoves;
     }
 
     /**
@@ -224,5 +264,51 @@ public class ChessGame {
         System.out.println(obj);
         System.out.println("\n");
 
+    }
+
+    public Set<ChessMove> removeBadMovesWithoutStalemate(Set<ChessMove> potentialMoves) {
+
+
+        ChessPosition startPositionForMoveToTry = new ChessPosition(7, 4);
+        ChessPosition endPositionForMoveToTry = new ChessPosition(6, 5);
+        // print(move);
+        ChessMove moveToTry = new ChessMove(startPositionForMoveToTry, endPositionForMoveToTry,null);
+
+
+        Iterator<ChessMove> iterator = potentialMoves.iterator();
+
+        while (iterator.hasNext()) {
+            ChessMove move = iterator.next();
+            if(moveToTry.endPosition.equals(move.endPosition)) {
+
+                print("0------in movetoTry in try");
+                print(board);
+                print(board.getLastMove());
+            }
+
+            ChessPosition kingPosition = new ChessPosition(6, 5);
+            if(kingPosition.equals(move.endPosition)) {
+                print("found pawn that shouldn't move");
+            }
+
+            ChessPosition startPosition = move.getStartPosition();
+            ChessPiece pieceToMove = board.getPiece(startPosition);
+            if(pieceToMove != null) {
+                TeamColor turn = pieceToMove.pieceColor;
+
+//                    makeMoveWithoutChangingTurn(move);
+                board.makeMove(move);
+                if (isInCheck(turn)) {
+                    iterator.remove(); // Remove the move if it leads to check
+                }
+                board.undoLastMove();
+//                    if(isInCheckmate(turn)) {
+//                        iterator.remove();
+//                    }
+            }
+
+
+        }
+        return potentialMoves;
     }
 }
