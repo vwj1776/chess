@@ -357,14 +357,17 @@ public class ChessGame {
                     ChessPosition pawnPosition = new ChessPosition(6, 5);
 
                     Set<ChessMove> movesOfAggressor = (Set<ChessMove>) piece.pieceMoves(board, piecePosition);  // Use the piece's move calculator
-                    for (ChessMove move : movesOfAggressor) {
-                        if(piecePosition.equals(pawnPosition)) {
-                            print("found Pawn");
-                        }
-                        if (move.getEndPosition().equals(kingPosition)) {
-                            return true;  // The position is under threat
+                    if(movesOfAggressor != null){
+                        for (ChessMove move : movesOfAggressor) {
+                            if(piecePosition.equals(pawnPosition)) {
+                                print("found Pawn");
+                            }
+                            if (move.getEndPosition().equals(kingPosition)) {
+                                return true;  // The position is under threat
+                            }
                         }
                     }
+
                 }
             }
         }
@@ -384,9 +387,9 @@ public class ChessGame {
         if(isInCheck(teamColor)) {
             checkmate = true;
         }
-//        if(canGetOutOfCheckByDeath()){
-//            checkmate = false;
-//        }
+        if(canGetOutOfCheckByDeath() && checkmate){
+            checkmate = false;
+        }
         return checkmate;
     }
 
@@ -394,7 +397,7 @@ public class ChessGame {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ChessPiece piece = board.getBoard()[row][col];
-                if (piece != null && piece.getTeamColor() == getTeamTurn() && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                if (piece != null && piece.getTeamColor() == getTeamTurn() && piece.getPieceType() != ChessPiece.PieceType.KING) {
                     ChessPosition piecePosition = new ChessPosition(row + 1, col + 1);
                     Collection<ChessMove> pieceMoves = getPotentialMoves(piecePosition);
 
@@ -402,9 +405,12 @@ public class ChessGame {
                     // make the baskic amove and then check for check
                     for(ChessMove move: pieceMoves){
                         board.makeMove(move);
-                        if (!pieceMoves.isEmpty() && !isInCheck(getTeamTurn())) {
+                        boolean check = isInCheck(getTeamTurn());
+                        if (!pieceMoves.isEmpty() && !check) {
+                            board.undoLastMove();
                             return true;
                         }
+                        board.undoLastMove();
                     }
 
                 }

@@ -166,14 +166,14 @@ public class GameStatusTests {
 
         var game = new ChessGame();
         game.setBoard(loadBoard("""
-                | | | | | |r|k| |
+               8| | | | | |r|k| |
                 | | | | | |P| |p|
                 | | | |N| | | | |
                 | | | | |B| | | |
                 | | | | | | | | |
                 | | | | | | | | |
                 | | | | |n| | | |
-                |K| | | | | |R| |
+               1|K| | | | | |R| |
                 """));
         game.setTeamTurn(ChessGame.TeamColor.BLACK);
 
