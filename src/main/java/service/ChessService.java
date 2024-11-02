@@ -4,6 +4,7 @@ import dataaccess.DataAccess;
 
 import dataaccess.UserResponse;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 
 import java.util.HashMap;
@@ -38,5 +39,26 @@ public class ChessService {
 
     public void logout(String authToken) {
         dataAccess.logout(authToken);
+    }
+
+    public String createGame(String gameName, String authToken){
+        return dataAccess.createGame(gameName, authToken);
+    }
+
+    public boolean validateAuthToken(String authToken){
+        return dataAccess.validateAuthToken(authToken);
+    }
+
+    public GameData[] listGames(String authToken){
+        return dataAccess.listGames(authToken);
+    }
+
+    public void clear(){
+        dataAccess.clear();
+    }
+
+    public boolean joinGame(String authToken, String gameID, String playerColor){
+        System.out.println("in service Join game");
+        return dataAccess.joinGame(authToken, gameID, playerColor);
     }
 }

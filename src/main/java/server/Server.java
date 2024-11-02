@@ -1,12 +1,17 @@
 package server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import dataaccess.UserResponse;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import spark.*;
 import service.ChessService;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -34,16 +39,125 @@ public class Server {
         Spark.post("/session", this::session);
         Spark.delete("/session", this::logout);
 
-//        Spark.delete("/session", this::deleteSession);
-//        Spark.post("/game", this::makeGame);
-//        Spark.put("/game", this::joinGame);
-//        Spark.delete("/db", this::clear);
+        Spark.post("/game", this::makeGame);
+        Spark.get("/game", this::listGames);
+
+        Spark.put("/game", this::joinGame);
+        Spark.delete("/db", this::clear);
 
 
 
 
         Spark.awaitInitialization();
         return Spark.port();
+    }
+
+    private Object joinGame(Request req, Response res) {
+        try {
+            // Extract auth token from header
+            String authToken = req.headers("authorization");
+
+            // Parse JSON body
+            JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();
+            String playerColor = body.get("playerColor").getAsString();
+            String gameID = body.get("gameID").getAsString();
+
+            // Call the joinGame function
+            boolean success = service.joinGame(authToken, gameID, playerColor);
+
+            if (success) {
+                res.status(200); // HTTP 200 OK
+                return "{}"; // Empty JSON response
+            } else {
+                res.status(500); // HTTP 500 Internal Server Error
+                return new Gson().toJson(Map.of("message", "Error: unknown error"));
+            }
+
+        } catch (IllegalArgumentException e) {
+            String message = e.getMessage();
+            switch (message) {
+                case "unauthorized":
+                    res.status(401);
+                    break;
+                case "bad request":
+                    res.status(400);
+                    break;
+                case "already taken":
+                    res.status(403);
+                    break;
+                default:
+                    res.status(500);
+                    break;
+            }
+            return new Gson().toJson(Map.of("message", "Error: " + message));
+        } catch (Exception e) {
+            res.status(500);
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
+        }
+    }
+
+
+    private Object clear(Request req, Response res) {
+        try {
+            service.clear(); // Assuming this calls `MemoryDataAccess.clearDatabase()`
+            res.status(200); // HTTP 200 OK
+            return "{}"; // Return empty JSON response
+        } catch (Exception e) {
+            res.status(500); // HTTP 500 Internal Server Error
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
+        }
+    }
+
+
+    private Object listGames(Request request, Response response) {
+        // Retrieve the authorization token from headers
+        String authToken = request.headers("authorization");
+
+        if (authToken == null || !service.validateAuthToken(authToken)) {
+            response.status(401); // Unauthorized
+            return new Gson().toJson(Map.of("message", "Error: unauthorized"));
+        }
+
+        try {
+            GameData[] games = service.listGames(authToken);
+
+            // Prepare response in the desired format
+            String jsonResponse = new Gson().toJson(Map.of("games", games));
+            response.status(200); // HTTP 200 OK
+            return jsonResponse;
+
+        } catch (Exception e) {
+            // If there is an error, send a 500 error with a descriptive message
+            response.status(500); // Internal Server Error
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
+        }
+    }
+
+    private Object makeGame(Request req, Response res) {
+        try {
+            Map requestMap = new Gson().fromJson(req.body(), Map.class);
+            String gameName = (String) requestMap.get("gameName");
+            String authToken = req.headers("Authorization");
+            System.out.println("Auth Token: " + authToken);
+            System.out.println(authToken);
+
+            System.out.println(gameName);
+            String gameId = service.createGame(gameName, authToken); // This may throw exceptions
+
+            res.status(200); // HTTP 200 OK
+            Map<String, String> map = new HashMap<>();
+            map.put("gameID", gameId);
+            return new Gson().toJson(map);
+        } catch (IllegalArgumentException e) {
+            res.status(400); // HTTP 400 Bad Request
+            return "{\"message\": \"Error: bad request\"}"; // Return raw JSON string
+        } catch (IllegalStateException e) {
+            res.status(401); // HTTP 401 Forbidden
+            return "{\"message\": \"Error: unauthorized\"}"; // Return raw JSON string
+        } catch (Exception e) {
+            res.status(500); // HTTP 500 Internal Server Error
+            return "{\"message\": \"Error: " + e.getMessage() + "\"}"; // Return raw JSON string
+        }
     }
 
     private Object logout(Request request, Response response) {
@@ -56,10 +170,11 @@ public class Server {
         } catch (Exception e) {
             response.status(401); // HTTP 401 Unauthorized
             return new Gson().toJson(Map.of("message", "Error: unauthorized")); // Return unauthorized error message
-        } catch (Exception e) {
-            response.status(500); // HTTP 500 Internal Server Error
-            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage())); // Return general error message
         }
+//        catch (Exception e) {
+//            response.status(500); // HTTP 500 Internal Server Error
+//            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage())); // Return general error message
+//        }
     }
 
     private Object session(Request request, Response response) {

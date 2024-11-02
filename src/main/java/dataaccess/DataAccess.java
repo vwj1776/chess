@@ -1,5 +1,6 @@
 package dataaccess;
 
+import model.GameData;
 import model.UserData;
 
 public interface DataAccess {
@@ -11,7 +12,15 @@ public interface DataAccess {
 
     void logout(String authToken);
 
+    String createGame(String gameName, String authToken);
 
+    boolean validateAuthToken(String authToken);
+
+    GameData[] listGames(String authToken);
+
+    void clear();
+
+    boolean joinGame(String authToken, String gameID, String playerColor);
 //    Collection<Pet> listPets() throws ResponseException;
 //
 //    Pet getPet(int id) throws ResponseException;
