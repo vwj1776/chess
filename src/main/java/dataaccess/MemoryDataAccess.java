@@ -12,7 +12,7 @@ public class MemoryDataAccess implements DataAccess {
     final private HashMap<String, AuthData> authData = new HashMap<>();
     final private HashMap<String, GameData> gameData = new HashMap<>();
     private final HashMap<String, UserData> authTokens = new HashMap<>(); // New map for auth tokens
-
+    private ArrayList<GameData> allGames = new ArrayList<>();
 
     public UserResponse addUser(UserData user) {
         users.put(user.username(), user);
@@ -89,6 +89,7 @@ public class MemoryDataAccess implements DataAccess {
             randomFourDigit = 1000 + new Random(System.currentTimeMillis()).nextInt(9000);
             GameData newGameData = new GameData(randomFourDigit, "username", null, gameName, newGame);
             gameData.put(authToken, newGameData);
+            allGames.add(newGameData);
             System.out.println("valid auth token" + gameData);
         }
 
@@ -108,13 +109,13 @@ public class MemoryDataAccess implements DataAccess {
 //        return null;
 //    }
 
-    @Override
-    public GameData[] listGames(String authToken) {
-        if (validateAuthToken(authToken)) {
-            return gameData.values().toArray(new GameData[0]); // Convert values to GameData array
-        }
-        return null;
-    }
+//    @Override
+//    public GameData[] listGames(String authToken) {
+//        if (validateAuthToken(authToken)) {
+//            return gameData.values().toArray(new GameData[0]); // Convert values to GameData array
+//        }
+//        return null;
+//    }
 
 
     @Override
@@ -171,6 +172,15 @@ public class MemoryDataAccess implements DataAccess {
 
         return true; // Successful join
     }
+    @Override
+    public ArrayList<GameData> listGames(String authToken) {
+        if(validateAuthToken(authToken)){
+            return allGames;
+        }
+        return null;
+    }
+
+
 
 
 //    @Override

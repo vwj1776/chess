@@ -3,6 +3,8 @@ package dataaccess;
 import model.GameData;
 import model.UserData;
 
+import java.util.ArrayList;
+
 public interface DataAccess {
     UserResponse addUser(UserData user);
 
@@ -16,7 +18,10 @@ public interface DataAccess {
 
     boolean validateAuthToken(String authToken);
 
-    GameData[] listGames(String authToken);
+    // GameData[] listGames(String authToken);
+
+    ArrayList<GameData> listGames(String authToken);
+
 
     void clear();
 

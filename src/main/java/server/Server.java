@@ -10,10 +10,7 @@ import model.UserData;
 import spark.*;
 import service.ChessService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class Server {
     private final ChessService service;
@@ -119,7 +116,7 @@ public class Server {
         }
 
         try {
-            GameData[] games = service.listGames(authToken);
+            ArrayList<GameData> games = service.listGames(authToken);
 
             // Prepare response in the desired format
             String jsonResponse = new Gson().toJson(Map.of("games", games));
