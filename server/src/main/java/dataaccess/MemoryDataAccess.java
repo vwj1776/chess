@@ -15,6 +15,12 @@ public class MemoryDataAccess implements DataAccess {
     private ArrayList<GameData> allGames = new ArrayList<>();
 
     public UserResponse addUser(UserData user) {
+        if(users.containsValue(user)){
+            throw new IllegalStateException("User already exists");
+        }
+        if(user.password() == null){
+            throw new IllegalArgumentException("No password, said like no capes in edna's voice fromm the Incredibles.");
+        }
         users.put(user.username(), user);
         // Generate an auth token
         String authToken = AuthData.generateToken(); // Assuming this method generates a new token
@@ -69,10 +75,16 @@ public class MemoryDataAccess implements DataAccess {
     }
 
 
-    public void logout(String authToken){
+    public void logout(String authToken) throws Exception {
         System.out.println(authToken);
+        if(authData.containsKey(authToken)){
+            authData.remove(authToken);
+        } else {
+            throw new Exception("Error: unauthorized");
 
-        authData.remove(authToken);
+        }
+
+
         System.out.println(authData);
 
     }
@@ -91,6 +103,8 @@ public class MemoryDataAccess implements DataAccess {
             gameData.put(authToken, newGameData);
             allGames.add(newGameData);
             System.out.println("valid auth token" + gameData);
+        } else{
+            throw new IllegalStateException("Error: unauthorized");
         }
 
 
@@ -124,6 +138,13 @@ public class MemoryDataAccess implements DataAccess {
         authData.clear();
         gameData.clear();
         authTokens.clear();
+        allGames.clear();
+        System.out.println("----------------------clearing hopefully");
+        System.out.println(authTokens);
+        System.out.println(gameData);
+        System.out.println(authData);
+        System.out.println(users);
+
     }
 
     @Override

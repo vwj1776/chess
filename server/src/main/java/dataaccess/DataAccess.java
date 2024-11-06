@@ -12,7 +12,7 @@ public interface DataAccess {
 
     UserResponse login(String username, String password);
 
-    void logout(String authToken);
+    void logout(String authToken) throws Exception;
 
     String createGame(String gameName, String authToken);
 

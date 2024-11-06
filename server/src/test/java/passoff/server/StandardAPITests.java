@@ -1,9 +1,12 @@
 package passoff.server;
 
 import chess.ChessGame;
+import dataaccess.DataAccess;
+import dataaccess.MemoryDataAccess;
 import org.junit.jupiter.api.*;
 import passoff.model.*;
 import server.Server;
+import service.ChessService;
 
 import java.net.HttpURLConnection;
 import java.util.Arrays;
@@ -32,7 +35,9 @@ public class StandardAPITests {
 
     @BeforeAll
     public static void init() {
-        server = new Server();
+        DataAccess dataAccess = new MemoryDataAccess();
+        ChessService service = new ChessService(dataAccess); // TODO: Am I not supposed to add these??
+        server = new Server(service);
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 

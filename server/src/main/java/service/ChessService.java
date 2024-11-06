@@ -38,7 +38,7 @@ public class ChessService {
         return  dataAccess.login(username, password);
     }
 
-    public void logout(String authToken) {
+    public void logout(String authToken) throws Exception {
         dataAccess.logout(authToken);
     }
 

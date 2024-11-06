@@ -96,7 +96,7 @@ public class Server {
 
     private Object clear(Request req, Response res) {
         try {
-            service.clear(); // Assuming this calls `MemoryDataAccess.clearDatabase()`
+            service.clear();
             res.status(200); // HTTP 200 OK
             return "{}"; // Return empty JSON response
         } catch (Exception e) {
