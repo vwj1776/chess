@@ -54,10 +54,27 @@ public class Server {
             // Extract auth token from header
             String authToken = req.headers("authorization");
 
+
             // Parse JSON body
             JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();
+            if (body.get("playerColor") == null) {
+                System.out.println("----------------------------------help " + body.get("gameID") + " ");
+                res.status(400);
+                throw new IllegalArgumentException("bad request");
+            }
             String playerColor = body.get("playerColor").getAsString();
+            System.out.println("----------------------------------help " + body.get("gameID") + " ");
+
+            if (body.get("gameID") == null) {
+                System.out.println("----------------------------------help " + body.get("gameID") + " ");
+                res.status(400);
+                throw new IllegalArgumentException("bad request");
+            }
+
             String gameID = body.get("gameID").getAsString();
+
+                System.out.println("----------------------------------help " + gameID + " ");
+
 
             // Call the joinGame function
             boolean success = service.joinGame(authToken, gameID, playerColor);
@@ -116,7 +133,7 @@ public class Server {
         }
 
         try {
-            ArrayList<GameData> games = service.listGames(authToken);
+            Collection<GameData> games = service.listGames(authToken);
 
             // Prepare response in the desired format
             String jsonResponse = new Gson().toJson(Map.of("games", games));

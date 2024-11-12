@@ -8,7 +8,9 @@ import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Set;
 
 
 public class ChessService {
@@ -50,7 +52,7 @@ public class ChessService {
         return dataAccess.validateAuthToken(authToken);
     }
 
-    public ArrayList<GameData> listGames(String authToken){
+    public Collection<GameData> listGames(String authToken){
         return dataAccess.listGames(authToken);
     }
 

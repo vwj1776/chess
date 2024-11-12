@@ -4,6 +4,8 @@ import model.GameData;
 import model.UserData;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 
 public interface DataAccess {
     UserResponse addUser(UserData user);
@@ -20,7 +22,7 @@ public interface DataAccess {
 
     // GameData[] listGames(String authToken);
 
-    ArrayList<GameData> listGames(String authToken);
+    Collection<GameData> listGames(String authToken);
 
 
     void clear();

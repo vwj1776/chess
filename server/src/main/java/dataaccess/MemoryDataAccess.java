@@ -12,7 +12,7 @@ public class MemoryDataAccess implements DataAccess {
     final private HashMap<String, AuthData> authData = new HashMap<>();
     final private HashMap<String, GameData> gameData = new HashMap<>();
     private final HashMap<String, UserData> authTokens = new HashMap<>(); // New map for auth tokens
-    private ArrayList<GameData> allGames = new ArrayList<>();
+    private Set<GameData> allGames = new HashSet<>();
 
     public UserResponse addUser(UserData user) {
         if(users.containsValue(user)){
@@ -69,7 +69,7 @@ public class MemoryDataAccess implements DataAccess {
         AuthData newAuthData = new AuthData(authToken, username);
 
         authData.put(authToken, newAuthData);
-
+        authTokens.put(authToken, user);
         // Return a new UserResponse containing the username and authToken
         return new UserResponse(username, authToken);
     }
@@ -97,10 +97,11 @@ public class MemoryDataAccess implements DataAccess {
 
             ChessGame newGame = new ChessGame();
 
+            UserData user = authTokens.get(authToken);
 
             randomFourDigit = 1000 + new Random(System.currentTimeMillis()).nextInt(9000);
-            GameData newGameData = new GameData(randomFourDigit, "username", null, gameName, newGame);
-            gameData.put(authToken, newGameData);
+            GameData newGameData = new GameData(randomFourDigit, null, null, gameName, newGame);
+            gameData.put("" + randomFourDigit, newGameData);
             allGames.add(newGameData);
             System.out.println("valid auth token" + gameData);
         } else{
@@ -151,33 +152,34 @@ public class MemoryDataAccess implements DataAccess {
     public boolean joinGame(String authToken, String gameID, String playerColor) throws IllegalArgumentException {
 //        System.out.println("in service Join game");
        //  System.out.println("authtokenValid?" + validateAuthToken(authToken));
-        System.out.println("authToken" + authToken);
+       //  System.out.println("authToken" + authToken);
 //        System.out.println("gameID" + gameID);
-//        System.out.println("playerColor" + playerColor);
+        System.out.println("playerColor" + playerColor);
 
         if (!validateAuthToken(authToken)) {
             throw new IllegalArgumentException("unauthorized");
         }
 
 
-        // System.out.println(gameData.get(gameID));
+        System.out.println("game is " + gameData.get(gameID));
+        int intGameId = Integer.parseInt(gameID);
+        GameData game = gameData.get(gameID); // should this be gameID????
+      //   System.out.println("----------------------------------help " + gameData.get(authToken).gameID() + " " + intGameId);
 
-        GameData game = gameData.get(authToken); // should this be gameID????
-        System.out.println(gameData);
-        if (game == null) {
+        if (game == null || !(gameData.get(gameID).gameID() == intGameId)) {
             throw new IllegalArgumentException("bad request");
         }
 
-        // Check if color is already taken
-        if ("WHITE".equals(playerColor) && game.whiteUsername() != null ||
-                "BLACK".equals(playerColor) && game.blackUsername() != null) {
+
+        if ("WHITE".equalsIgnoreCase(playerColor) && game.whiteUsername() != null ||
+                "BLACK".equalsIgnoreCase(playerColor) && game.blackUsername() != null) {
             throw new IllegalArgumentException("already taken");
         }
 
         // Get the username from the auth token
         UserData user = authTokens.get(authToken);
         System.out.println("user" + user);
-        System.out.println("authTokens" + authTokens);
+        // System.out.println("authTokens" + authTokens);
 
 
         if (user == null) {
@@ -185,18 +187,26 @@ public class MemoryDataAccess implements DataAccess {
         }
 
         // Update the game record with the player's username for the specified color
-        GameData updatedGame = "WHITE".equals(playerColor)
-                ? new GameData(game.gameID(), user.username(), game.blackUsername(), game.gameName(), game.game())
-                : new GameData(game.gameID(), game.whiteUsername(), user.username(), game.gameName(), game.game());
+//        GameData updatedGame = "WHITE".equals(playerColor)
+//                ? new GameData(game.gameID(), user.username(), game.blackUsername(), game.gameName(), game.game())
+//                : new GameData(game.gameID(), game.whiteUsername(), user.username(), game.gameName(), game.game());
 
+        GameData updatedGame;
+        if(playerColor.equalsIgnoreCase("WHITE")){
+            updatedGame = new GameData(intGameId, user.username(), game.blackUsername(), game.gameName(), game.game());
+        } else {
+            updatedGame = new GameData(intGameId, game.whiteUsername(), user.username(), game.gameName(), game.game());
+        }
         gameData.put(gameID, updatedGame); // Update the game data
+        allGames.add(updatedGame);
+        System.out.println("gameData   " + gameData);
 
         return true; // Successful join
     }
     @Override
-    public ArrayList<GameData> listGames(String authToken) {
+    public Collection<GameData> listGames(String authToken) {
         if(validateAuthToken(authToken)){
-            return allGames;
+            return gameData.values();
         }
         return null;
     }
