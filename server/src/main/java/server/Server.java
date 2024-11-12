@@ -3,6 +3,8 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dataaccess.DataAccess;
+import dataaccess.MemoryDataAccess;
 import dataaccess.UserResponse;
 import model.AuthData;
 import model.GameData;
@@ -13,11 +15,10 @@ import service.ChessService;
 import java.util.*;
 
 public class Server {
-    private final ChessService service;
+    private DataAccess dataAccess = new MemoryDataAccess();
+    private final ChessService service = new ChessService(dataAccess);
 
-    public Server(ChessService service) {
-        this.service = service;
-    }
+
 
     public int run(int desiredPort) {
 

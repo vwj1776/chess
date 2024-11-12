@@ -35,9 +35,8 @@ public class StandardAPITests {
 
     @BeforeAll
     public static void init() {
-        DataAccess dataAccess = new MemoryDataAccess();
-        ChessService service = new ChessService(dataAccess); // TODO: Am I not supposed to add these??
-        server = new Server(service);
+
+        server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
 
