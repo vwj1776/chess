@@ -7,16 +7,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;
+import java.util.UUID;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class UserDatabaseTest {
     MySqlDataAccess userDatabase;
     UserData testUser;
 
     @BeforeEach
-    void settingUp(){
+    void settingUp() throws ResponseException, DataAccessException {
+        userDatabase = new MySqlDataAccess();
 
+        String username = "user" + generateRandomString();
+        String password = "pass" + generateRandomString();
+        String email = "email" + generateRandomString() + "@yourmom.gov";
+
+        testUser = new UserData(username, password, email);
+    }
+
+    private String generateRandomString() {
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 
     @AfterEach
@@ -24,34 +37,13 @@ public class UserDatabaseTest {
 
     }
 
+
     @Test
-    void addUser() throws ResponseException {
-        userDatabase.addUser(testUser);
+    void createUser() throws ResponseException {
+        userDatabase.createUser(testUser);
 
-        String username = "username";
-        String password = "password";
-        String email = "email";
-        var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
+        var getUser = userDatabase.getUser(testUser.username());
 
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ps.setString(3, email);
-            String authToken = AuthData.generateToken(); //todo:figure out authtoken
-
-            ps.executeUpdate();
-            try (var rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    var userId = rs.getInt(1); // where the heck do we get the authtoken from here?
-                    return new UserResponse(username, String.valueOf(authToken));
-                }
-            }
-
-            throw new ResponseException(500, "User could not be added. No ID was generated.");
-        } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(500, String.format("Unable to add user: %s", e.getMessage()));
-        }
-
+        assertNotNull(getUser);
     }
 }
