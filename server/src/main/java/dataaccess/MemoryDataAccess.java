@@ -23,7 +23,7 @@ public class MemoryDataAccess implements DataAccess {
         }
         users.put(user.username(), user);
         // Generate an auth token
-        String authToken = AuthData.generateToken(); // Assuming this method generates a new token
+        String authToken = AuthData.generateToken();
 
         // Create a response object
         UserResponse response = new UserResponse(user.username(), authToken);
@@ -39,17 +39,12 @@ public class MemoryDataAccess implements DataAccess {
 
     public UserData getUser(String username) {
         System.out.println("in memory");
-
-        // Retrieve the user from the map
         UserData user = users.get(username);
         System.out.println(user);
-
-        // Return user, can be null if not found
         return user;
     }
 
     public UserResponse login(String username, String password) {
-        // Check if the user exists
         UserData user = users.get(username);
 
         if (user == null) {
@@ -60,10 +55,8 @@ public class MemoryDataAccess implements DataAccess {
         // Check if the password matches
         if (!user.password().equals(password)) {
             // Password does not match, return null or throw an exception
-            return null; // This will lead to a 401 Unauthorized response in the session method
+            return null; // This will lead to a 401
         }
-
-        // If authentication is successful, generate a new auth token
         String authToken = AuthData.generateToken();
         System.out.println(authToken);
         AuthData newAuthData = new AuthData(authToken, username);
