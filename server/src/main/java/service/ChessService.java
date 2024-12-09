@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccess;
 
+import dataaccess.ResponseException;
 import dataaccess.UserResponse;
 import model.AuthData;
 import model.GameData;
@@ -27,16 +28,16 @@ public class ChessService {
     // A more complicated application would do the business logic in this
     // service.
 
-    public UserResponse addUser(UserData user) {
+    public UserResponse addUser(UserData user) throws ResponseException {
         return dataAccess.addUser(user);
     }
 
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws ResponseException {
         return dataAccess.getUser(username);
     }
 
 
-    public UserResponse login(String username, String password) {
+    public UserResponse login(String username, String password) throws ResponseException {
         return  dataAccess.login(username, password);
     }
 
@@ -44,23 +45,23 @@ public class ChessService {
         dataAccess.logout(authToken);
     }
 
-    public String createGame(String gameName, String authToken){
+    public String createGame(String gameName, String authToken) throws ResponseException{
         return dataAccess.createGame(gameName, authToken);
     }
 
-    public boolean validateAuthToken(String authToken){
+    public boolean validateAuthToken(String authToken) throws ResponseException{
         return dataAccess.validateAuthToken(authToken);
     }
 
-    public Collection<GameData> listGames(String authToken){
+    public Collection<GameData> listGames(String authToken) throws ResponseException{
         return dataAccess.listGames(authToken);
     }
 
-    public void clear(){
+    public void clear() throws ResponseException{
         dataAccess.clear();
     }
 
-    public boolean joinGame(String authToken, String gameID, String playerColor){
+    public boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException{
         System.out.println("in service Join game");
         return dataAccess.joinGame(authToken, gameID, playerColor);
     }

@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
+import dataaccess.ResponseException;
 import dataaccess.UserResponse;
 import model.AuthData;
 import model.GameData;
@@ -124,7 +125,7 @@ public class Server {
     }
 
 
-    private Object listGames(Request request, Response response) {
+    private Object listGames(Request request, Response response) throws ResponseException {
         // Retrieve the authorization token from headers
         String authToken = request.headers("authorization");
 
@@ -247,7 +248,7 @@ public class Server {
 //        System.out.println(username);
 //        return service.getUser(username);
 //    }
-private Object getUser(Request req, Response res) {
+private Object getUser(Request req, Response res) throws ResponseException {
     String username = req.params(":username");
     System.out.println("in get user");
     System.out.println("username " + username);

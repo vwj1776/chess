@@ -8,26 +8,26 @@ import java.util.Collection;
 import java.util.Set;
 
 public interface DataAccess {
-    UserResponse addUser(UserData user);
+    UserResponse addUser(UserData user) throws ResponseException;
 
-    UserData getUser(String username);
+    UserData getUser(String username) throws ResponseException;
 
-    UserResponse login(String username, String password);
+    UserResponse login(String username, String password) throws ResponseException;
 
     void logout(String authToken) throws Exception;
 
-    String createGame(String gameName, String authToken);
+    String createGame(String gameName, String authToken) throws ResponseException;
 
-    boolean validateAuthToken(String authToken);
+    boolean validateAuthToken(String authToken) throws ResponseException;
 
     // GameData[] listGames(String authToken);
 
-    Collection<GameData> listGames(String authToken);
+    Collection<GameData> listGames(String authToken) throws ResponseException;
 
 
-    void clear();
+    void clear() throws ResponseException;
 
-    boolean joinGame(String authToken, String gameID, String playerColor);
+    boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException;
 //    Collection<Pet> listPets() throws ResponseException;
 //
 //    Pet getPet(int id) throws ResponseException;
