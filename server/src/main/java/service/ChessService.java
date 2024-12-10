@@ -2,6 +2,7 @@ package service;
 
 import dataaccess.DataAccess;
 
+import dataaccess.DataAccessException;
 import dataaccess.ResponseException;
 import dataaccess.UserResponse;
 import model.AuthData;
@@ -28,7 +29,7 @@ public class ChessService {
     // A more complicated application would do the business logic in this
     // service.
 
-    public UserResponse addUser(UserData user) throws ResponseException {
+    public UserResponse addUser(UserData user) throws ResponseException, DataAccessException {
         return dataAccess.addUser(user);
     }
 
@@ -45,7 +46,7 @@ public class ChessService {
         dataAccess.logout(authToken);
     }
 
-    public String createGame(String gameName, String authToken) throws ResponseException{
+    public String createGame(String gameName, String authToken) throws ResponseException, DataAccessException {
         return dataAccess.createGame(gameName, authToken);
     }
 

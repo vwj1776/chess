@@ -14,17 +14,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class UserDatabaseTest {
-    MySqlDataAccess userDatabase;
+    UserDataBaseAccess userDatabase;
     UserData testUser;
+    String username = "user" + generateRandomString();
+    String password = "pass" + generateRandomString();
+    String email = "email" + generateRandomString() + "@yourmom.gov";
 
     @BeforeEach
     void settingUp() throws ResponseException, DataAccessException {
-        userDatabase = new MySqlDataAccess();
-
-        String username = "user" + generateRandomString();
-        String password = "pass" + generateRandomString();
-        String email = "email" + generateRandomString() + "@yourmom.gov";
-
+        userDatabase = new UserDataBaseAccess();
         testUser = new UserData(username, password, email);
     }
 
@@ -39,11 +37,30 @@ public class UserDatabaseTest {
 
 
     @Test
-    void createUser() throws ResponseException {
+    void createUser() throws ResponseException, DataAccessException {
+        userDatabase.createUser(testUser);
+
+        var getUser = userDatabase.getUser(testUser.username());
+
+        assertEquals(getUser, testUser);
+    }
+
+    @Test
+    void getUser() throws ResponseException, DataAccessException {
         userDatabase.createUser(testUser);
 
         var getUser = userDatabase.getUser(testUser.username());
 
         assertNotNull(getUser);
+    }
+
+    @Test
+    void login() throws ResponseException, DataAccessException {
+
+    }
+
+    @Test
+    void logout() throws ResponseException, DataAccessException {
+
     }
 }

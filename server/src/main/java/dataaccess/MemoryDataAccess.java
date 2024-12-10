@@ -143,10 +143,7 @@ public class MemoryDataAccess implements DataAccess {
 
     @Override
     public boolean joinGame(String authToken, String gameID, String playerColor) throws IllegalArgumentException {
-//        System.out.println("in service Join game");
-       //  System.out.println("authtokenValid?" + validateAuthToken(authToken));
-       //  System.out.println("authToken" + authToken);
-//        System.out.println("gameID" + gameID);
+
         System.out.println("playerColor" + playerColor);
 
         if (!validateAuthToken(authToken)) {
@@ -157,7 +154,6 @@ public class MemoryDataAccess implements DataAccess {
         System.out.println("game is " + gameData.get(gameID));
         int intGameId = Integer.parseInt(gameID);
         GameData game = gameData.get(gameID); // should this be gameID????
-      //   System.out.println("----------------------------------help " + gameData.get(authToken).gameID() + " " + intGameId);
 
         if (game == null || !(gameData.get(gameID).gameID() == intGameId)) {
             throw new IllegalArgumentException("bad request");
@@ -169,7 +165,6 @@ public class MemoryDataAccess implements DataAccess {
             throw new IllegalArgumentException("already taken");
         }
 
-        // Get the username from the auth token
         UserData user = authTokens.get(authToken);
         System.out.println("user" + user);
         // System.out.println("authTokens" + authTokens);
@@ -178,11 +173,6 @@ public class MemoryDataAccess implements DataAccess {
         if (user == null) {
             throw new IllegalArgumentException("unauthorized");
         }
-
-        // Update the game record with the player's username for the specified color
-//        GameData updatedGame = "WHITE".equals(playerColor)
-//                ? new GameData(game.gameID(), user.username(), game.blackUsername(), game.gameName(), game.game())
-//                : new GameData(game.gameID(), game.whiteUsername(), user.username(), game.gameName(), game.game());
 
         GameData updatedGame;
         if(playerColor.equalsIgnoreCase("WHITE")){

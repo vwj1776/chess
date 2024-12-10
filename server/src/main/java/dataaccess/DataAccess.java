@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Set;
 
 public interface DataAccess {
-    UserResponse addUser(UserData user) throws ResponseException;
+    UserResponse addUser(UserData user) throws ResponseException, DataAccessException;
 
     UserData getUser(String username) throws ResponseException;
 
@@ -16,7 +16,7 @@ public interface DataAccess {
 
     void logout(String authToken) throws Exception;
 
-    String createGame(String gameName, String authToken) throws ResponseException;
+    String createGame(String gameName, String authToken) throws ResponseException, DataAccessException;
 
     boolean validateAuthToken(String authToken) throws ResponseException;
 
