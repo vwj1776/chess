@@ -14,7 +14,7 @@ public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
 
     public ChessBoard() {
-        
+
     }
 
     /**
@@ -51,7 +51,7 @@ public class ChessBoard {
             return false;
         }
         ChessBoard that = (ChessBoard) o;
-        return Objects.deepEquals(board, that.board);
+        return toString().equals(that.toString());
     }
 
     @Override
@@ -61,9 +61,16 @@ public class ChessBoard {
 
     @Override
     public String toString() {
-        return "ChessBoard{" +
-                "board=" + Arrays.toString(board) +
-                '}';
+        StringBuilder stringBuilder = new StringBuilder();
+        for(int i=1; i<=8; i++){
+            for(int j=1; j<=8; j++){
+                ChessPosition position = new ChessPosition(i, j);
+                if(isValidPosition(position)){
+                    stringBuilder.append(getPiece(position));
+                }
+            }
+        }
+        return "" + stringBuilder;
     }
 
     /**
@@ -96,5 +103,13 @@ public class ChessBoard {
         for (int col = 1; col <= 8; col++) {
             addPiece(new ChessPosition(7, col), new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN));
         }
+    }
+
+    public void print(Object object){
+        System.out.println(object);
+    }
+
+    private Boolean isValidPosition(ChessPosition position){
+        return getPiece(position) != null;
     }
 }
