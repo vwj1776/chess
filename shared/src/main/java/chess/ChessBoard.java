@@ -37,9 +37,12 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        int row = position.getRow()-1;
-        int col = position.getColumn()-1;
-        return board[row][col];
+        if(isValidPosition(position)){
+            int row = position.getRow()-1;
+            int col = position.getColumn()-1;
+            return board[row][col];
+        }
+        return null;
     }
 
     @Override
