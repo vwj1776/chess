@@ -109,7 +109,13 @@ public class ChessBoard {
         System.out.println(object);
     }
 
-    private Boolean isValidPosition(ChessPosition position){
-        return getPiece(position) != null;
+    public boolean isValidPosition(ChessPosition position) {
+        if(position != null) {
+            if(position.getRow()-1 <= 7 && position.getColumn()-1 <= 7 && position.getRow()-1 >= 0 && position.getColumn()-1 >= 0) {
+                return true;
+            }
+
+        }
+        return false;
     }
 }
