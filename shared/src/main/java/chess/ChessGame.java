@@ -86,15 +86,12 @@ public class ChessGame {
         print("validMovesNew");
 
         return validMovesNew;
-        //return validMoves;
     }
 
     private Set<ChessMove> doGetValidMoves(ChessPosition startPosition) {
         if(getTeamTurn() == null) {
             setTeamTurn(TeamColor.WHITE);
         }
-
-        // validMoves.clear();
         Set<ChessMove> validMoves = new HashSet<>();
         ChessPiece piece = board.getPiece(startPosition);
         if(piece != null) {
@@ -106,64 +103,6 @@ public class ChessGame {
         return validMoves;
     }
 
-    public Set<ChessMove> removeBadMoves(Set<ChessMove> potentialMoves) {
-
-        Iterator<ChessMove> iterator = potentialMoves.iterator();
-        // print(potentialMoves);
-        while (iterator.hasNext()) {
-            ChessMove move = iterator.next();
-
-            try {
-
-                ChessPosition startPosition = move.getStartPosition();
-                ChessPiece pieceToMove = board.getPiece(startPosition);
-
-                ChessPosition startPositionForMoveToTry = new ChessPosition(7, 4);
-                ChessPosition endPositionForMoveToTry = new ChessPosition(8, 5);
-                // print(move);
-                ChessMove moveToTry = new ChessMove(startPositionForMoveToTry, endPositionForMoveToTry,null);
-                if(moveToTry.endPosition.equals(move.endPosition)) {
-
-                    print("0------in movetoTry in try");
-                    print(board);
-                    print(board.getLastMove());
-                }
-
-//                if(!moveToTry.startPosition.equals(move.startPosition)) {
-//                    print("0------in movetoTry in try");
-//                }
-
-                if(pieceToMove != null) {
-                    TeamColor turn = pieceToMove.pieceColor;
-                    makeMoveWithoutChangingTurn(move);
-                    boolean check = isInCheck(turn);
-                    boolean mate = isInCheckmate(turn);
-                    boolean stalemate = isInStalemate(turn);
-
-                    if (check) {
-                        iterator.remove(); // Remove the move if it leads to check
-                    }
-
-                    if(mate) {
-                        iterator.remove();
-                    }
-
-                    if(stalemate){
-                        iterator.remove();
-                    }
-                    if(!check && !mate && !stalemate) { //
-                        board.undoLastMove();
-                    }
-                }
-
-
-            } catch (InvalidMoveException e) {
-                //  print(e);
-                iterator.remove(); // Remove the move if it's an invalid move
-            }
-        }
-        return potentialMoves;
-    }
 
     public Set<ChessMove> removeBadMovesWithoutStalemate(Set<ChessMove> potentialMoves) {
 
@@ -195,15 +134,12 @@ public class ChessGame {
             if(pieceToMove != null) {
                 TeamColor turn = pieceToMove.pieceColor;
 
-//                    makeMoveWithoutChangingTurn(move);
                 board.makeMove(move);
                 if (isInCheck(turn)) {
                     iterator.remove(); // Remove the move if it leads to check
                 }
                 board.undoLastMove();
-//                    if(isInCheckmate(turn)) {
-//                        iterator.remove();
-//                    }
+
             }
 
 
@@ -294,12 +230,6 @@ public class ChessGame {
         if( board.getLastMove() != null) {
             board.undoLastMove();
         }
-//        if(isInStalemate(pieceToMove.getTeamColor())) {
-//            board.undoLastMove();
-//            potentialMoves.remove(move);
-//            throw new InvalidMoveException("In StaleMate");
-//        }
-
     }
 
 
@@ -317,8 +247,6 @@ public class ChessGame {
         if(teamColor == TeamColor.WHITE) {
             oppositeTeamColor = TeamColor.BLACK;
         }
-
-
         return isUnderThreat(kingPosition, oppositeTeamColor);
     }
 
@@ -330,8 +258,6 @@ public class ChessGame {
      */
     private ChessPosition findKingPosition(TeamColor teamColor) {
         // Iterate through the chessboard to find the king's position
-
-
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 ChessPiece piece = board.getBoard()[row][col];
