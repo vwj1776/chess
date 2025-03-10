@@ -385,11 +385,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        // ChessPosition kingPosition = findKingPosition(teamColor);
-        boolean check = false;
-        if(isInCheck(teamColor)) {
-            check = true;
-        }
+        boolean check = isInCheck(teamColor);
         boolean getOut = canGetOutOfCheckByDeath();
         boolean checkmate = check;
         if(getOut && check){
@@ -486,20 +482,12 @@ public class ChessGame {
      * @param newBoard new board to use
      */
     public void setBoard(ChessBoard newBoard) {
-
-
         ChessPiece[][] newBoardState = newBoard.getBoard();
         ChessPiece[][] oldBoardState = board.getBoard();
 
-
-
-
-        // Make sure the dimensions match
         if (newBoardState.length != oldBoardState.length || newBoardState[0].length != oldBoardState[0].length) {
             throw new IllegalArgumentException("Dimensions of the new board do not match the current board");
         }
-
-        // Copy the new board's state to the current board
         for (int row = 0; row < oldBoardState.length; row++) {
             for (int col = 0; col < oldBoardState[row].length; col++) {
                 oldBoardState[row][col] = newBoardState[row][col];
