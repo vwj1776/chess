@@ -195,10 +195,6 @@ public class Server {
             response.status(401); // HTTP 401 Unauthorized
             return new Gson().toJson(Map.of("message", "Error: unauthorized")); // Return unauthorized error message
         }
-//        catch (Exception e) {
-//            response.status(500); // HTTP 500 Internal Server Error
-//            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage())); // Return general error message
-//        }
     }
 
     private Object session(Request request, Response response) {
@@ -247,15 +243,6 @@ public class Server {
         }
     }
 
-
-
-    //    private Object getUser(Request req, Response res) {
-//        String username = req.params(":username");
-//        System.out.println("in get user");
-//
-//        System.out.println(username);
-//        return service.getUser(username);
-//    }
     private Object getUser(Request req, Response res) throws ResponseException {
         String username = req.params(":username");
         System.out.println("in get user");
@@ -270,10 +257,6 @@ public class Server {
             return new Gson().toJson(("message" + "User not found, better luck next time, bwahahahaha"));
         }
     }
-
-
-
-
 
     public void stop() {
         Spark.stop();

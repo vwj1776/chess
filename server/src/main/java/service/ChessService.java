@@ -21,10 +21,6 @@ public class ChessService {
         this.dataAccess = dataAccess;
     }
 
-    // Pet Shop is very simple.
-    // A more complicated application would do the business logic in this
-    // service.
-
     public UserResponse addUser(UserData user) throws ResponseException, DataAccessException {
         return dataAccess.addUser(user);
     }

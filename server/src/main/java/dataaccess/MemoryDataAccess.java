@@ -109,23 +109,6 @@ public class MemoryDataAccess implements DataAccess {
         return authData.containsKey(authToken);
     }
 
-//    @Override
-//    public GameData listGames(String authToken) {
-//        if(validateAuthToken(authToken)){
-//            return gameData.get(authToken); // TODO: return all games???
-//        }
-//        return null;
-//    }
-
-//    @Override
-//    public GameData[] listGames(String authToken) {
-//        if (validateAuthToken(authToken)) {
-//            return gameData.values().toArray(new GameData[0]); // Convert values to GameData array
-//        }
-//        return null;
-//    }
-
-
     @Override
     public void clear(){
         users.clear();
@@ -161,11 +144,6 @@ public class MemoryDataAccess implements DataAccess {
             throw new IllegalArgumentException("bad request");
         }
 
-//        if (playerColor.equalsIgnoreCase("black") || playerColor.equalsIgnoreCase("white") ) {
-//            throw new IllegalArgumentException("bad request, invalid player color");
-//        }
-
-
         if ("WHITE".equalsIgnoreCase(playerColor) && game.whiteUsername() != null ||
                 "BLACK".equalsIgnoreCase(playerColor) && game.blackUsername() != null) {
             throw new IllegalArgumentException("already taken");
@@ -199,53 +177,4 @@ public class MemoryDataAccess implements DataAccess {
         }
         return null;
     }
-
-
-
-
-//    @Override
-//    public GameData[] listGames(String authToken) {
-//        UserData[] usersByAuthToken = getUsersByAuthToken(authToken);
-//        System.out.println(Arrays.toString(usersByAuthToken) + "in memory");
-//
-//        if (usersByAuthToken.length == 0) {
-//            return new GameData[0];
-//        }
-//
-//        String username = usersByAuthToken[0].username();
-//
-//        return gameData.values().stream()
-//                .filter(game -> username.equals(game.whiteUsername()) || username.equals(game.blackUsername()))
-//                .toArray(GameData[]::new);
-//    }
-
-
-//    public UserData[] getUsersByAuthToken(String authToken) {
-//        UserData user = authTokens.get(authToken);
-//        System.out.println(user + "user");
-//        System.out.println(authToken + "authToken");
-//
-//        if (user != null) {
-//            return new UserData[]{user};
-//        } else {
-//            return new UserData[0];
-//        }
-//    }
-
-    //    public Collection<Pet> listPets() {
-//        return pets.values();
-//    }
-//
-//
-//    public Pet getPet(int id) {
-//        return pets.get(id);
-//    }
-//
-//    public void deletePet(Integer id) {
-//        pets.remove(id);
-//    }
-//
-//    public void deleteAllPets() {
-//        pets.clear();
-//    }
 }

@@ -18,19 +18,11 @@ public interface DataAccess {
 
     boolean validateAuthToken(String authToken) throws ResponseException;
 
-    // GameData[] listGames(String authToken);
-
     Collection<GameData> listGames(String authToken) throws ResponseException;
 
 
     void clear() throws ResponseException;
 
     boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException;
-//    Collection<Pet> listPets() throws ResponseException;
-//
-//    Pet getPet(int id) throws ResponseException;
-//
-//    void deletePet(Integer id) throws ResponseException;
-//
-//    void deleteAllPets() throws ResponseException;
+
 }
