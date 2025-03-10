@@ -1,0 +1,18 @@
+CREATE TABLE IF NOT EXISTS AuthData (
+    authToken VARCHAR(36) PRIMARY KEY,
+    username VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS GameData (
+    gameID INT PRIMARY KEY AUTO_INCREMENT,
+    whiteUsername VARCHAR(255) NOT NULL,
+    blackUsername VARCHAR(255) NOT NULL,
+    gameName VARCHAR(255) NOT NULL,
+    game BLOB NOT NULL
+);
+
+CREATE TABLE user_data (
+    username VARCHAR(255) PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL
+);
