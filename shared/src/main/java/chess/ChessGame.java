@@ -539,18 +539,5 @@ public class ChessGame {
         return copyBoard;
     }
 
-    public Set<ChessMove> getAllMovesExceptKing( TeamColor oppositeTeamColor) {
-        Set<ChessMove> movesOfAggressors = new HashSet<>();  // Use the piece's move calculator
 
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                ChessPiece piece = board.getBoard()[row][col];
-                if (piece != null && piece.getPieceType() != ChessPiece.PieceType.KING && piece.getTeamColor() ==oppositeTeamColor) {
-                    ChessPosition position = new ChessPosition(row+1, col+1);
-                    movesOfAggressors.addAll(piece.pieceMoves(board, position));
-                }
-            }
-        }
-        return movesOfAggressors;
-    }
 }
