@@ -144,6 +144,8 @@ public class MemoryDataAccess implements DataAccess {
     @Override
     public boolean joinGame(String authToken, String gameID, String playerColor) throws IllegalArgumentException {
 
+
+
         System.out.println("playerColor" + playerColor);
 
         if (!validateAuthToken(authToken)) {
@@ -158,6 +160,10 @@ public class MemoryDataAccess implements DataAccess {
         if (game == null || !(gameData.get(gameID).gameID() == intGameId)) {
             throw new IllegalArgumentException("bad request");
         }
+
+//        if (playerColor.equalsIgnoreCase("black") || playerColor.equalsIgnoreCase("white") ) {
+//            throw new IllegalArgumentException("bad request, invalid player color");
+//        }
 
 
         if ("WHITE".equalsIgnoreCase(playerColor) && game.whiteUsername() != null ||

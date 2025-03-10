@@ -59,7 +59,7 @@ public class ChessService {
     }
 
     public boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException{
-        System.out.println("in service Join game");
+        System.out.println("in service Join game" + "playerColor" + playerColor);
         return dataAccess.joinGame(authToken, gameID, playerColor);
     }
 }

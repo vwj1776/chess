@@ -59,10 +59,15 @@ public class Server {
 
             // Parse JSON body
             JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();
-            if (body.get("playerColor") == null) {
+            if (body.get("playerColor") == null || body.get("playerColor").getAsString().isEmpty()) {
                 System.out.println("----------------------------------help " + body.get("gameID") + " ");
                 res.status(400);
                 throw new IllegalArgumentException("bad request");
+            }
+            if (!body.get("playerColor").getAsString().equalsIgnoreCase("black") && !body.get("playerColor").getAsString().equalsIgnoreCase("white") ) {
+                System.out.println("----------------------------------help " + body.get("gameID") + " ");
+                res.status(400);
+                throw new IllegalArgumentException("bad request, invalid player color");
             }
             String playerColor = body.get("playerColor").getAsString();
             System.out.println("----------------------------------help " + body.get("gameID") + " ");
@@ -96,6 +101,9 @@ public class Server {
                     res.status(401);
                     break;
                 case "bad request":
+                    res.status(400);
+                    break;
+                case "bad request, invalid player color":
                     res.status(400);
                     break;
                 case "already taken":
