@@ -10,16 +10,9 @@ import java.util.*;
  */
 public class ChessGame {
 
-
-
-    //  private Set<ChessMove> validMoves = new HashSet<>();
-
     private TeamColor turn = TeamColor.WHITE;
 
     private ChessBoard board = new ChessBoard();
-
-
-
 
     public ChessGame() {
         board.resetBoard();
