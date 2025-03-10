@@ -14,6 +14,9 @@ public class ChessBoard {
 
     private ChessMove lastMove;
 
+    private ChessPiece pieceThatItWas;
+
+
 
     public ChessBoard() {
 
@@ -25,6 +28,21 @@ public class ChessBoard {
 
     public ChessMove getLastMove() {
         return lastMove;
+    }
+
+    public void makeMove(ChessMove move) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+        pieceThatItWas = getPiece(endPosition);
+        ChessPiece pieceToMove = getPiece(startPosition);
+        addPiece(endPosition, pieceToMove);
+        addPiece(startPosition, null);
+        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+        if (promotionPiece != null && pieceToMove.getPieceType() == ChessPiece.PieceType.PAWN) {
+            ChessPiece promotedPiece = new ChessPiece(pieceToMove.getTeamColor(), promotionPiece);
+            addPiece(endPosition, promotedPiece);
+        }
+        lastMove = move;
     }
 
 
