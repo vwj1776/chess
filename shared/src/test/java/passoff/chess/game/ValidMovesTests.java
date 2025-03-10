@@ -116,6 +116,10 @@ public class ValidMovesTests {
 
         var validMoves = TestUtilities.loadMoves(kingPosition, new int[][]{{6, 5}});
 
+        System.out.println("kingPosition"+ kingPosition);
+        System.out.println("validMoves" + validMoves.toString());
+
+
         assertMoves(game, validMoves, kingPosition);
 
         //make sure teams other pieces are not allowed to move

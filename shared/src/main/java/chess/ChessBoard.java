@@ -45,6 +45,23 @@ public class ChessBoard {
         lastMove = move;
     }
 
+    public void undoLastMove() {
+        //TODO undo make move reverse
+        if(lastMove != null) {
+            ChessPosition startPosition = lastMove.getEndPosition();
+            ChessPosition endPosition = lastMove.getStartPosition();
+            ChessPiece pieceToMove = getPiece(startPosition);
+            ChessPiece undoPromotionPiece = getPiece(lastMove.startPosition);
+            if (undoPromotionPiece != null) {
+                addPiece(endPosition, undoPromotionPiece);
+            } else {
+                addPiece(endPosition, pieceToMove);
+            }
+            addPiece(startPosition, pieceThatItWas); // cant make it null if it was captured, make it the peice it was
+        }
+        lastMove =null;
+    }
+
 
     /**
      * Adds a chess piece to the chessboard

@@ -76,12 +76,15 @@ public class ChessGame {
             print("0------in movetoTry 1st");
             print(validMoves);
         }
-        if(isInCheckmate(getTeamTurn()) || isInStalemate(getTeamTurn())) {
-            return null;
+        boolean checkmate = isInCheckmate(getTeamTurn());
+        boolean stalemate = isInStalemate(getTeamTurn());
+        if(checkmate || stalemate) {
+            return new ArrayList<>();
         }
         Set<ChessMove> validMovesNew = removeBadMovesWithoutStalemate(validMoves);
 
-        //  print(validMovesNew);
+        print("validMovesNew");
+
         return validMovesNew;
         //return validMoves;
     }
@@ -383,11 +386,13 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         // ChessPosition kingPosition = findKingPosition(teamColor);
-        boolean checkmate = false;
+        boolean check = false;
         if(isInCheck(teamColor)) {
-            checkmate = true;
+            check = true;
         }
-        if(canGetOutOfCheckByDeath() && checkmate){
+        boolean getOut = canGetOutOfCheckByDeath();
+        boolean checkmate = check;
+        if(getOut && check){
             checkmate = false;
         }
         return checkmate;
@@ -396,8 +401,11 @@ public class ChessGame {
     private boolean canGetOutOfCheckByDeath() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
+                if(row+1 == 5 && col+1 == 4){
+                    print("in problem");
+                }
                 ChessPiece piece = board.getBoard()[row][col];
-                if (piece != null && piece.getTeamColor() == getTeamTurn() && piece.getPieceType() != ChessPiece.PieceType.KING) {
+                if (piece != null && piece.getTeamColor() == getTeamTurn()) {
                     ChessPosition piecePosition = new ChessPosition(row + 1, col + 1);
                     Collection<ChessMove> pieceMoves = getPotentialMoves(piecePosition);
 
@@ -418,6 +426,7 @@ public class ChessGame {
         }
         return false;
     }
+
 
     public Set<ChessMove> getPotentialMoves(ChessPosition position){
         Set<ChessMove> validMoves = new HashSet<>();
