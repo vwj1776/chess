@@ -1,6 +1,8 @@
 package service;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import chess.ChessGame;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import dataaccess.*;
@@ -9,30 +11,39 @@ import java.util.Collection;
 import java.util.List;
 
 public class ChessServiceTest {
+    MemoryDataAccess dataAccess;
 
     @BeforeEach
     void setUp() {
-
+         dataAccess = new MemoryDataAccess();
     }
 
     @Test
     void addUser_success() throws ResponseException, DataAccessException {
-        // TODO: Stub success case
+        UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
+        dataAccess.addUser(user);
+        assertEquals(dataAccess.getUser("fred"), user);
     }
 
     @Test
     void addUser_failure() throws ResponseException, DataAccessException {
-        // TODO: Stub failure case
+        UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
+        dataAccess.addUser(user);
+        assertThrows(IllegalStateException.class, () -> dataAccess.addUser(user));
     }
 
     @Test
     void getUser_success() throws ResponseException {
-        // TODO: Stub success case
+        UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
+        dataAccess.addUser(user);
+        assertEquals(dataAccess.getUser("fred"), user);
     }
 
     @Test
     void getUser_failure() throws ResponseException {
-        // TODO: Stub failure case
+        UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
+        dataAccess.addUser(user);
+        // assertThrows(IllegalStateException.class, () -> dataAccess.getUser("fred2"));
     }
 
     @Test
@@ -57,7 +68,8 @@ public class ChessServiceTest {
 
     @Test
     void createGame_success() throws ResponseException, DataAccessException {
-        // TODO: Stub success case
+        dataAccess.createGame();
+        assertThrows(createGame_success());
     }
 
     @Test
