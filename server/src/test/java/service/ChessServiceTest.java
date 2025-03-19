@@ -1,3 +1,5 @@
+package service;
+
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,12 +9,10 @@ import java.util.Collection;
 import java.util.List;
 
 public class ChessServiceTest {
-    private ChessService chessService;
-    private DataAccess mockDataAccess;
 
     @BeforeEach
     void setUp() {
-        chessService = new ChessService(mockDataAccess);
+
     }
 
     @Test
