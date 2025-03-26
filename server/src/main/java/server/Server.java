@@ -16,7 +16,7 @@ import service.ChessService;
 import java.util.*;
 
 public class Server {
-    private DataAccess dataAccess = new MemoryDataAccess();
+    private final DataAccess dataAccess = new MemoryDataAccess();
     private final ChessService service = new ChessService(dataAccess);
 
 

@@ -74,11 +74,24 @@ public class MemoryDataAccess implements DataAccess {
         return new UserResponse(username, authToken);
     }
 
+    public boolean isLoggedInByToken(String authToken) {
+        return authTokens.containsKey(authToken) && authTokens.get(authToken) != null;
+    }
+
+    public boolean isLoggedInByUser(UserData user) {
+        UserData authTokensUser = users.get(user.username());
+        System.out.println(authTokensUser);
+        return authTokens.containsValue(user);
+    }
+
+
+
 
     public void logout(String authToken) throws Exception {
         System.out.println(authToken);
         if(authData.containsKey(authToken)){
             authData.remove(authToken);
+            authTokens.remove(authToken);
         } else {
             throw new Exception("Error: unauthorized");
 
