@@ -41,9 +41,12 @@ public class MemoryDataAccess implements DataAccess {
         authData.put(authToken, auth);
     }
 
-    public UserData getUser(String username) {
+    public UserData getUser(String username) throws IllegalStateException {
         System.out.println("in memory");
         UserData user = users.get(username);
+        if(user == null){
+            throw new IllegalStateException("User not found");
+        }
         System.out.println(user);
         return user;
     }

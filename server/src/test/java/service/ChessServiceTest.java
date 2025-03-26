@@ -12,15 +12,21 @@ import java.util.List;
 
 public class ChessServiceTest {
     MemoryDataAccess dataAccess;
+    String authToken;
+    UserData user;
+    AuthData newAuthData;
+
 
     @BeforeEach
     void setUp() {
-         dataAccess = new MemoryDataAccess();
+        dataAccess = new MemoryDataAccess();
+        authToken = AuthData.generateToken();
+        user = new UserData("fred", "fred@fred.com", "fred@fred.com");
+        newAuthData = new AuthData(authToken, user.username());
     }
 
     @Test
     void addUser_success() throws ResponseException, DataAccessException {
-        UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
         dataAccess.addUser(user);
         assertEquals(dataAccess.getUser("fred"), user);
     }
@@ -43,7 +49,7 @@ public class ChessServiceTest {
     void getUser_failure() throws ResponseException {
         UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
         dataAccess.addUser(user);
-        // assertThrows(IllegalStateException.class, () -> dataAccess.getUser("fred2"));
+        assertThrows(IllegalStateException.class, () -> dataAccess.getUser("fred2"));
     }
 
     @Test
@@ -84,9 +90,7 @@ public class ChessServiceTest {
 
     @Test
     void validateAuthToken_success() throws ResponseException {
-        String authToken = AuthData.generateToken();
-        UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
-        AuthData newAuthData = new AuthData(authToken, user.username());
+
         dataAccess.addAuthToken(authToken, newAuthData);
         assertTrue(dataAccess.validateAuthToken(authToken));
     }
