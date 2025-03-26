@@ -75,6 +75,7 @@ public class ChessServiceTest {
     @Test
     void createGame_failure() throws ResponseException, DataAccessException {
         String invalidAuthToken = "invalidToken";
+
         assertThrows(IllegalStateException.class, () -> {
             dataAccess.createGame("insertNameHere", invalidAuthToken);
         });
@@ -83,7 +84,11 @@ public class ChessServiceTest {
 
     @Test
     void validateAuthToken_success() throws ResponseException {
-        // TODO: Stub success case
+        String authToken = AuthData.generateToken();
+        UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
+        AuthData newAuthData = new AuthData(authToken, user.username());
+        dataAccess.addAuthToken(authToken, newAuthData);
+        assertTrue(dataAccess.validateAuthToken(authToken));
     }
 
     @Test

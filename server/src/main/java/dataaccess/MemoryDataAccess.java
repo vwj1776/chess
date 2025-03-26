@@ -37,6 +37,10 @@ public class MemoryDataAccess implements DataAccess {
         return response;
     }
 
+    public void addAuthToken(String authToken, AuthData auth) {
+        authData.put(authToken, auth);
+    }
+
     public UserData getUser(String username) {
         System.out.println("in memory");
         UserData user = users.get(username);
@@ -108,6 +112,7 @@ public class MemoryDataAccess implements DataAccess {
     public boolean validateAuthToken(String authToken){
         return authData.containsKey(authToken);
     }
+
 
     @Override
     public void clear(){
