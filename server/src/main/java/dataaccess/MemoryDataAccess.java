@@ -55,17 +55,17 @@ public class MemoryDataAccess implements DataAccess {
         UserData user = users.get(username);
 
         if (user == null) {
-            // User not found, return null or throw an exception
+            System.out.println("User" + user);
             return null; // This will lead to a 401 Unauthorized response in the session method
         }
 
         // Check if the password matches
         if (!user.password().equals(password)) {
-            // Password does not match, return null or throw an exception
+            System.out.println("password does not match");
             return null; // This will lead to a 401
         }
         String authToken = AuthData.generateToken();
-        System.out.println(authToken);
+        System.out.println("authToken in login" + authToken);
         AuthData newAuthData = new AuthData(authToken, username);
 
         authData.put(authToken, newAuthData);
@@ -80,7 +80,10 @@ public class MemoryDataAccess implements DataAccess {
 
     public boolean isLoggedInByUser(UserData user) {
         UserData authTokensUser = users.get(user.username());
-        System.out.println(authTokensUser);
+        System.out.println("user " + user);
+        System.out.println("users " + users);
+
+        System.out.println("authTokensUser " + authTokensUser);
         return authTokens.containsValue(user);
     }
 

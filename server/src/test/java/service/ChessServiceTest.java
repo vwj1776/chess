@@ -53,7 +53,9 @@ public class ChessServiceTest {
     }
 
     @Test
-    void login_success() throws ResponseException {
+    void login_success() {
+        dataAccess.addUser(user);
+
         dataAccess.login(user.username(), user.password());
 
         assertTrue(dataAccess.isLoggedInByUser(user));
@@ -81,11 +83,13 @@ public class ChessServiceTest {
 
     @Test
     void listGames_success() throws ResponseException {
+        dataAccess.clear();
         dataAccess.addAuthToken(authToken, newAuthData);
         dataAccess.createGame("TestGame1", authToken);
         dataAccess.createGame("TestGame2", authToken);
 
         Collection<GameData> games = dataAccess.listGames(authToken);
+        System.out.println("games" + games);
         assertNotNull(games);
         assertEquals(2, games.size());
     }
