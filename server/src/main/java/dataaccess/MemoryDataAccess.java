@@ -4,6 +4,7 @@ import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import java.util.Random;
 
 import java.util.*;
 
@@ -13,6 +14,7 @@ public class MemoryDataAccess implements DataAccess {
     final private HashMap<String, GameData> gameData = new HashMap<>();
     private final HashMap<String, UserData> authTokens = new HashMap<>(); // New map for auth tokens
     private Set<GameData> allGames = new HashSet<>();
+    private static final Random random = new Random();
 
     public UserResponse addUser(UserData user) {
         if(users.containsValue(user)){
@@ -115,7 +117,7 @@ public class MemoryDataAccess implements DataAccess {
 
             UserData user = authTokens.get(authToken);
 
-            randomFourDigit = 1000 + new Random(System.currentTimeMillis()).nextInt(9000);
+            randomFourDigit = 1000 + random.nextInt(9000);
             GameData newGameData = new GameData(randomFourDigit, null, null, gameName, newGame);
             gameData.put("" + randomFourDigit, newGameData);
             allGames.add(newGameData);
