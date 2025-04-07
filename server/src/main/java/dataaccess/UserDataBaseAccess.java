@@ -47,8 +47,8 @@ public class UserDataBaseAccess implements DataAccess {
 
 
     private void configureDatabase() throws ResponseException, DataAccessException {
-        DatabaseManager.createDatabase();
-        try (var conn = DatabaseManager.getConnection()) {
+        DatabaseManager01.createDatabase();
+        try (var conn = DatabaseManager01.getConnection()) {
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
@@ -86,7 +86,7 @@ public class UserDataBaseAccess implements DataAccess {
         if(getUser(username) != null){
             throw new DataAccessException("Username already in database:" + username);
         }
-        try (var conn = DatabaseManager.getConnection();
+        try (var conn = DatabaseManager01.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
             ps.setString(2, password);
@@ -106,8 +106,8 @@ public class UserDataBaseAccess implements DataAccess {
     public UserData getUser(String username) throws ResponseException {
         var statement = "SELECT username, password, email FROM UserData WHERE username = ?";
 
-        try (var conn = DatabaseManager.getConnection();
-            var ps = conn.prepareStatement(statement)) {
+        try (var conn = DatabaseManager01.getConnection();
+             var ps = conn.prepareStatement(statement)) {
 
             ps.setString(1, username);
 
@@ -159,7 +159,7 @@ public class UserDataBaseAccess implements DataAccess {
 
     public void addGame(GameData gameData) throws ResponseException {
         var statement = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)";
-        try (var conn = DatabaseManager.getConnection();
+        try (var conn = DatabaseManager01.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
             ps.setInt(1, gameData.gameID());
             ps.setString(2, gameData.whiteUsername());
@@ -177,7 +177,7 @@ public class UserDataBaseAccess implements DataAccess {
 
     private void executeCreatGame(String statement, String gameName, String authToken) throws ResponseException, DataAccessException {
 
-        try (var conn = DatabaseManager.getConnection();
+        try (var conn = DatabaseManager01.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
             ps.setString(1, gameName);
 
@@ -203,7 +203,7 @@ public class UserDataBaseAccess implements DataAccess {
         var games = new ArrayList<GameData>();
         var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData";
 
-        try (var conn = DatabaseManager.getConnection();
+        try (var conn = DatabaseManager01.getConnection();
              var ps = conn.prepareStatement(statement);
              var rs = ps.executeQuery()) {
 
