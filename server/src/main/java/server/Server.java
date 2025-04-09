@@ -18,10 +18,18 @@ import java.util.*;
 public class Server {
     private final DataAccess dataAccess = new MemoryDataAccess();
     private final ChessService service = new ChessService(dataAccess);
+    public int port;
 
+    public Server() {
+        // webSocketHandler = new WebSocketHandler();
+    }
 
+    public int getPort(){
+        return port;
+    }
 
     public int run(int desiredPort) {
+        this.port = desiredPort;
 
         Spark.port(desiredPort);
 
