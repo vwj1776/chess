@@ -20,7 +20,7 @@ public class DatabaseManager {
                 }
                 Properties props = new Properties();
                 props.load(propStream);
-                System.out.println("in try");
+                System.out.println("in try DbManager");
 
                 DATABASE_NAME = props.getProperty("db.name");
                 USER = props.getProperty("db.user");
