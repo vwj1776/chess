@@ -1,12 +1,8 @@
 import chess.*;
 import dataaccess.DataAccess;
 import dataaccess.MemoryDataAccess;
-import dataaccess.MySqlDataAccess;
 import server.Server;
-import dataaccess.DataAccess;
-import dataaccess.MemoryDataAccess;
-import dataaccess.MySqlDataAccess;
-import service.ChessService;
+import dataaccess.UserDataBaseAccess;
 
 public class Main {
     public static void main(String[] args) {
@@ -23,7 +19,7 @@ public class Main {
 
             DataAccess dataAccess = new MemoryDataAccess();
             if (args.length >= 2 && args[1].equals("sql")) {
-                dataAccess = new MySqlDataAccess();
+                dataAccess = new UserDataBaseAccess();
             }
 
            //  var service = new ChessService(dataAccess);
