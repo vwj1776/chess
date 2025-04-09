@@ -159,7 +159,7 @@ public class UserDataBaseAccess implements DataAccess {
     public UserResponse login(String username, String password) throws ResponseException {
         UserData user = getUser(username);
 
-        if (user != null && Objects.equals(user.password(), password)) {
+        if (user != null && BCrypt.checkpw(password, user.password())) { // 👈 password check
             try {
                 String token = addAuthToken(user);
                 return new UserResponse(username, token);
@@ -170,6 +170,7 @@ public class UserDataBaseAccess implements DataAccess {
 
         throw new ResponseException(4, "Invalid login");
     }
+
 
 
     public String createAuthtoken(){
