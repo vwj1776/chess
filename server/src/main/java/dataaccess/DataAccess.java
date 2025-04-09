@@ -8,9 +8,9 @@ import java.util.Collection;
 public interface DataAccess {
     UserResponse addUser(UserData user) throws ResponseException, DataAccessException;
 
-    UserData getUser(String username) throws ResponseException;
+    UserData getUser(String username) throws ResponseException, DataAccessException;
 
-    UserResponse login(String username, String password) throws ResponseException;
+    UserResponse login(String username, String password) throws ResponseException, DataAccessException;
 
     void logout(String authToken) throws Exception;
 

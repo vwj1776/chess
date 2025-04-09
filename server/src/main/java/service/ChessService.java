@@ -25,12 +25,12 @@ public class ChessService {
         return dataAccess.addUser(user);
     }
 
-    public UserData getUser(String username) throws ResponseException {
+    public UserData getUser(String username) throws ResponseException, DataAccessException {
         return dataAccess.getUser(username);
     }
 
 
-    public UserResponse login(String username, String password) throws ResponseException {
+    public UserResponse login(String username, String password) throws ResponseException, DataAccessException {
         return  dataAccess.login(username, password);
     }
 

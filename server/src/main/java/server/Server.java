@@ -221,28 +221,23 @@ public class Server {
     }
 
     private Object session(Request request, Response response) {
-        // Parse the request body to extract username and password
         UserData userData = new Gson().fromJson(request.body(), UserData.class);
         String username = userData.username();
         String password = userData.password();
 
-        // Attempt to log in the user
         try {
-            // Assume the service method returns an AuthData object upon successful login
             UserResponse authData = service.login(username, password);
-
-            if (authData != null) {
-                response.status(200); // HTTP 200 OK
-                return new Gson().toJson(Map.of("username", username, "authToken", authData.getAuthToken())); // Return username and authToken as JSON
-            } else {
-                response.status(401); // HTTP 401 Unauthorized
-                return new Gson().toJson(Map.of("message", "Error: unauthorized")); // Return unauthorized error message
-            }
+            response.status(200);
+            return new Gson().toJson(Map.of("username", username, "authToken", authData.getAuthToken()));
+        } catch (ResponseException e) {
+            response.status(e.getStatusCode()); // ← Now responds with correct status (like 401)
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         } catch (Exception e) {
-            response.status(500); // HTTP 500 Internal Server Error
-            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage())); // Return general error message
+            response.status(500);
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         }
     }
+
 
 
     // make records user obj, service no websocket for now
@@ -250,23 +245,27 @@ public class Server {
     private Object addUser(Request req, Response res) {
         try {
             UserData user = new Gson().fromJson(req.body(), UserData.class);
-            UserResponse response = service.addUser(user); // This may throw exceptions
+            UserResponse response = service.addUser(user);
 
             res.status(200); // HTTP 200 OK
-            return new Gson().toJson(response); // Return user as JSON
+            return new Gson().toJson(response);
+
+        } catch (ResponseException e) {
+            res.status(e.getStatusCode());
+            return "{\"message\": \"Error: " + e.getMessage() + "\"}";
+
         } catch (IllegalArgumentException e) {
-            res.status(400); // HTTP 400 Bad Request
-            return "{\"message\": \"Error: bad request\"}"; // Return raw JSON string
-        } catch (IllegalStateException e) {
-            res.status(403); // HTTP 403 Forbidden
-            return "{\"message\": \"Error: already taken\"}"; // Return raw JSON string
+            res.status(400);
+            return "{\"message\": \"Error: bad request\"}";
+
         } catch (Exception e) {
-            res.status(500); // HTTP 500 Internal Server Error
-            return "{\"message\": \"Error: " + e.getMessage() + "\"}"; // Return raw JSON string
+            res.status(500);
+            return "{\"message\": \"Error: " + e.getMessage() + "\"}";
         }
     }
 
-    private Object getUser(Request req, Response res) throws ResponseException {
+
+    private Object getUser(Request req, Response res) throws ResponseException, DataAccessException {
         String username = req.params(":username");
         System.out.println("in get user");
         System.out.println("username " + username);

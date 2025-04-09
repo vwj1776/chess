@@ -10,7 +10,6 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Objects;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -77,7 +76,7 @@ public class UserDataBaseAccess implements DataAccess {
             ps.setString(2, user.username());
             ps.executeUpdate();
         } catch (SQLException e) {
-            throw new DataAccessException("Unable to add auth token: " + e.getMessage());
+            throw new DataAccessException("Unable to add auth token: " + e.getMessage(), e);
         }
 
         return authToken;
@@ -98,8 +97,9 @@ public class UserDataBaseAccess implements DataAccess {
     private UserResponse executeAddUser(String statement, String username, String password, String email) throws ResponseException, DataAccessException {
 
         if (getUser(username) != null) {
-            throw new DataAccessException("Username already in database:" + username);
+            throw new ResponseException(403, "Username already in database: " + username);
         }
+
 
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 
@@ -113,8 +113,8 @@ public class UserDataBaseAccess implements DataAccess {
 
             return new UserResponse(username, addAuthToken(new UserData(username, hashedPassword, email)));
 
-        } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(500, String.format("Unable to add user: %s", e.getMessage()));
+        } catch (SQLException e) {
+            throw new ResponseException(500, "Unable to add user: " + e.getMessage());
         }
     }
 
@@ -123,7 +123,7 @@ public class UserDataBaseAccess implements DataAccess {
 
 
     @Override
-    public UserData getUser(String username) throws ResponseException {
+    public UserData getUser(String username) throws DataAccessException {
         var statement = "SELECT username, password, email FROM UserData WHERE username = ?";
 
         try (var conn = DatabaseManager.getConnection();
@@ -136,18 +136,17 @@ public class UserDataBaseAccess implements DataAccess {
                     var retrievedUsername = rs.getString("username");
                     var password = rs.getString("password");
                     var email = rs.getString("email");
-                    var user = new UserData(retrievedUsername, password, email);
-                    System.out.println(user);
                     return new UserData(retrievedUsername, password, email);
                 }
             }
+
             return null;
 
-        } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(500, String.format("Unable to find user: %s", e.getMessage()));
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to find user: " + e.getMessage(), e);
         }
-
     }
+
 
 //    @Override
 //    public UserResponse login(String username, String password) throws ResponseException {
@@ -162,20 +161,22 @@ public class UserDataBaseAccess implements DataAccess {
 //    }
 
     @Override
-    public UserResponse login(String username, String password) throws ResponseException {
+    public UserResponse login(String username, String password) throws ResponseException, DataAccessException {
         UserData user = getUser(username);
 
-        if (user != null && BCrypt.checkpw(password, user.password())) { // 👈 password check
-            try {
-                String token = addAuthToken(user);
-                return new UserResponse(username, token);
-            } catch (DataAccessException e) {
-                throw new ResponseException(500, "Unable to generate auth token");
-            }
+        if (user == null || !BCrypt.checkpw(password, user.password())) {
+            throw new ResponseException(401, "Invalid login");
         }
 
-        throw new ResponseException(4, "Invalid login");
+        try {
+            String token = addAuthToken(user);
+            return new UserResponse(username, token);
+        } catch (DataAccessException e) {
+            throw new ResponseException(500, "Unable to generate auth token");
+        }
     }
+
+
 
 
 
@@ -389,7 +390,8 @@ public class UserDataBaseAccess implements DataAccess {
             ps.setString(1, token);
             try (var rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getString("username");
-                throw new DataAccessException("Invalid auth token");
+                SQLException e = null;
+                throw new DataAccessException("Invalid auth token", e);
             }
         }
     }
