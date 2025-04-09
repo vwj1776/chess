@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -95,13 +96,13 @@ public class UserDataBaseAccess implements DataAccess {
     }
 
     private UserResponse executeAddUser(String statement, String username, String password, String email) throws ResponseException, DataAccessException {
-        if(getUser(username) != null){
+        if (getUser(username) != null) {
             throw new DataAccessException("Username already in database:" + username);
         }
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setString(2, BCrypt.hashpw(password, BCrypt.gensalt())); // 👈 hashed password
             ps.setString(3, email);
 
             ps.executeUpdate();
@@ -111,6 +112,7 @@ public class UserDataBaseAccess implements DataAccess {
         }
         return null;
     }
+
 
 
 
