@@ -66,11 +66,22 @@ public class UserDataBaseAccess implements DataAccess {
 //
 //    }
 
-    public void addAuthToken(UserData user){
-        String authToken = AuthData.generateToken(); //todo:figure out authtoken
-        var statement = "INSERT INTO AuthData (username, password, email) VALUES (?, ?, ?)";
+    public String addAuthToken(UserData user) throws DataAccessException {
+        String authToken = AuthData.generateToken();
+        var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
 
+        try (var conn = DatabaseManager01.getConnection();
+             var ps = conn.prepareStatement(statement)) {
+            ps.setString(1, authToken);
+            ps.setString(2, user.username());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to add auth token: " + e.getMessage());
+        }
+
+        return authToken;
     }
+
 
     @Override
     public UserResponse addUser(UserData user) throws ResponseException, DataAccessException {
@@ -129,17 +140,34 @@ public class UserDataBaseAccess implements DataAccess {
         }
     }
 
+//    @Override
+//    public UserResponse login(String username, String password) throws ResponseException {
+//        UserData user = getUser(username);
+//        UserResponse response = null;
+//
+//
+//        if(Objects.equals(user.password(), password)){
+//            response = new UserResponse(username, createAuthtoken());
+//        }
+//        return response;
+//    }
+
     @Override
     public UserResponse login(String username, String password) throws ResponseException {
         UserData user = getUser(username);
-        UserResponse response = null;
 
-
-        if(Objects.equals(user.password(), password)){
-            response = new UserResponse(username, createAuthtoken());
+        if (user != null && Objects.equals(user.password(), password)) {
+            try {
+                String token = addAuthToken(user);
+                return new UserResponse(username, token);
+            } catch (DataAccessException e) {
+                throw new ResponseException(500, "Unable to generate auth token");
+            }
         }
-        return response;
+
+        throw new ResponseException(401, "Invalid login");
     }
+
 
     public String createAuthtoken(){
         return AuthData.generateToken();
@@ -218,8 +246,21 @@ public class UserDataBaseAccess implements DataAccess {
 
     @Override
     public boolean validateAuthToken(String authToken) {
-        return true; //todo: make this work
+        var sql = "SELECT authToken FROM AuthData WHERE authToken = ?";
+
+        try (var conn = DatabaseManager01.getConnection();
+             var ps = conn.prepareStatement(sql)) {
+            ps.setString(1, authToken);
+
+            try (var rs = ps.executeQuery()) {
+                return rs.next(); // true if found
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
     }
+
 
     @Override
     public Collection<GameData> listGames(String authToken) throws ResponseException {
