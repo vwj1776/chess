@@ -57,5 +57,21 @@ public class juinitDBtests {
         assertNotNull(gameId);
     }
 
+    @Test
+    void listGames_positive() throws Exception {
+        UserData user = new UserData("harry", "pw", "harry@mail.com");
+        dao.addUser(user);
+        String token = dao.addAuthToken(user);
+        dao.createGame("G1", token);
+        dao.createGame("G2", token);
+        Collection<GameData> games = dao.listGames(token);
+        assertEquals(2, games.size());
+    }
+
+    @Test
+    void listGames_negative_invalidToken() {
+        assertThrows(ResponseException.class, () -> dao.listGames("fake-token"));
+    }
+
 
 }
