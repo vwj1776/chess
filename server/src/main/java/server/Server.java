@@ -79,6 +79,7 @@ public class Server {
             String authToken = req.headers("authorization");
 
 
+
             // Parse JSON body
             JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();
             if (body.get("playerColor") == null || body.get("playerColor").getAsString().isEmpty()) {
@@ -136,10 +137,16 @@ public class Server {
                     break;
             }
             return new Gson().toJson(Map.of("message", "Error: " + message));
-        } catch (Exception e) {
+        }
+        catch (ResponseException e) {
+            res.status(e.getStatusCode());
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
+        }
+        catch (Exception e) {
             res.status(500);
             return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         }
+
     }
 
 

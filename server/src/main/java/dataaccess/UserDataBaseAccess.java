@@ -88,6 +88,9 @@ public class UserDataBaseAccess implements DataAccess {
         if (user == null || user.username() == null || user.password() == null || user.email() == null) {
             throw new ResponseException(400, "Missing fields");
         }
+//        if(getUser(user.username())){
+//
+//        }
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
         return executeAddUser(statement, user.username(), user.password(), user.email());
     }
@@ -379,10 +382,13 @@ public class UserDataBaseAccess implements DataAccess {
 
 
     @Override
-    public boolean joinGame(String authToken, String gameID, String playerColor) {
+    public boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException {
+        System.out.println("join game");
+
         if (!playerColor.equalsIgnoreCase("WHITE") && !playerColor.equalsIgnoreCase("BLACK")) {
             throw new IllegalArgumentException("Invalid player color: " + playerColor);
         }
+
         try (var conn = DatabaseManager.getConnection()) {
             String column = switch (playerColor.toUpperCase()) {
                 case "WHITE" -> "whiteUsername";
@@ -390,21 +396,44 @@ public class UserDataBaseAccess implements DataAccess {
                 default -> throw new IllegalArgumentException("Invalid player color: " + playerColor);
             };
 
-            String statement = "UPDATE GameData SET " + column + " = ? WHERE gameID = ?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, getUsernameFromAuth(authToken)); // From AuthData
+            String username;
+            try {
+                username = getUsernameFromAuth(authToken);
+            } catch (DataAccessException e) {
+                throw new ResponseException(401, "Invalid auth token");
+            }
+
+            // ✅ Check if color is already taken
+            String checkQuery = "SELECT " + column + " FROM GameData WHERE gameID = ?";
+            try (var checkStmt = conn.prepareStatement(checkQuery)) {
+                checkStmt.setInt(1, Integer.parseInt(gameID));
+                try (var rs = checkStmt.executeQuery()) {
+                    if (rs.next()) {
+                        String currentUser = rs.getString(column);
+                        if (currentUser != null && !currentUser.isEmpty()) {
+                            throw new ResponseException(403, "Color already taken");
+                        }
+                    } else {
+                        throw new ResponseException(400, "Game not found");
+                    }
+                }
+            }
+
+            // ✅ Now safe to insert
+            String updateStmt = "UPDATE GameData SET " + column + " = ? WHERE gameID = ?";
+            try (var ps = conn.prepareStatement(updateStmt)) {
+                ps.setString(1, username);
                 ps.setInt(2, Integer.parseInt(gameID));
-
                 int updated = ps.executeUpdate();
-
                 return updated > 0;
             }
 
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+        } catch (SQLException | DataAccessException e) {
+            throw new ResponseException(500, "Unable to join game: " + e.getMessage());
         }
     }
+
+
 
     private String getUsernameFromAuth(String token) throws SQLException, DataAccessException {
         var sql = "SELECT username FROM AuthData WHERE authToken = ?";
