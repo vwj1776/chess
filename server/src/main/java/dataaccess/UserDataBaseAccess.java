@@ -189,13 +189,17 @@ public class UserDataBaseAccess implements DataAccess {
 
     @Override
     public void logout(String authToken) throws ResponseException {
+        String statement = "DELETE FROM AuthData WHERE authtoken = ?";
+        System.out.println("About to logout with token: " + authToken);
+
         try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement("DELETE FROM AuthToken WHERE token = ?")) {
+             var ps = conn.prepareStatement(statement)) {
 
             ps.setString(1, authToken);
-            int affected = ps.executeUpdate();
-
-            if (affected == 0) {
+            int affectedRows = ps.executeUpdate();
+            System.out.println("Affected rows: " + affectedRows);
+            if (affectedRows == 0) {
+                System.out.println("Throwing 401 for invalid token");
                 throw new ResponseException(401, "Invalid auth token");
             }
 
@@ -203,6 +207,8 @@ public class UserDataBaseAccess implements DataAccess {
             throw new ResponseException(500, "Unable to logout: " + e.getMessage());
         }
     }
+
+
 
 
 
@@ -273,7 +279,8 @@ public class UserDataBaseAccess implements DataAccess {
     @Override
     public String createGame(String gameName, String authToken) throws ResponseException, DataAccessException {
         if (!validateAuthToken(authToken)) {
-            throw new ResponseException(4, "Invalid auth token");
+            System.out.println("in not valid auth");
+            throw new ResponseException(401, "Invalid auth token");
         }
 
         var statement = "INSERT INTO GameData (gameName, game) VALUES (?, ?)";

@@ -21,7 +21,6 @@ public class Server {
 
     public Server() {
         try {
-            // this.dataAccess = new MemoryDataAccess();
             this.dataAccess = new UserDataBaseAccess();
             this.service = new ChessService(this.dataAccess);
         } catch (Exception e) {
@@ -185,40 +184,46 @@ public class Server {
             Map requestMap = new Gson().fromJson(req.body(), Map.class);
             String gameName = (String) requestMap.get("gameName");
             String authToken = req.headers("Authorization");
+
             System.out.println("Auth Token: " + authToken);
-            System.out.println(authToken);
-
             System.out.println(gameName);
-            String gameId = service.createGame(gameName, authToken); // This may throw exceptions
 
-            res.status(200); // HTTP 200 OK
-            Map<String, String> map = new HashMap<>();
-            map.put("gameID", gameId);
-            return new Gson().toJson(map);
+            String gameId = service.createGame(gameName, authToken); // may throw ResponseException
+
+            res.status(200);
+            return new Gson().toJson(Map.of("gameID", gameId));
+
+        } catch (ResponseException e) {
+            res.status(e.getStatusCode());
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
+
         } catch (IllegalArgumentException e) {
-            res.status(400); // HTTP 400 Bad Request
-            return "{\"message\": \"Error: bad request\"}"; // Return raw JSON string
-        } catch (IllegalStateException e) {
-            res.status(401); // HTTP 401 Forbidden
-            return "{\"message\": \"Error: unauthorized\"}"; // Return raw JSON string
+            res.status(400);
+            return new Gson().toJson(Map.of("message", "Error: bad request"));
+
         } catch (Exception e) {
-            res.status(500); // HTTP 500 Internal Server Error
-            return "{\"message\": \"Error: " + e.getMessage() + "\"}"; // Return raw JSON string
+            res.status(500);
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         }
     }
 
-    private Object logout(Request request, Response response) {
-        String authToken = request.headers("authorization");
+
+    private Object logout(Request req, Response res) {
+        String authToken = req.headers("Authorization");
+        System.out.println("Headers: " + req.headers());
 
         try {
             service.logout(authToken);
-            response.status(200); // HTTP 200 OK
-            return "{}"; // Return empty JSON object
+            res.status(200);
+            return "{}";
+        } catch (ResponseException e) {
+            res.status(e.getStatusCode());
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         } catch (Exception e) {
-            response.status(401); // HTTP 401 Unauthorized
-            return new Gson().toJson(Map.of("message", "Error: unauthorized")); // Return unauthorized error message
+            throw new RuntimeException(e);
         }
     }
+
 
     private Object session(Request request, Response response) {
         UserData userData = new Gson().fromJson(request.body(), UserData.class);
