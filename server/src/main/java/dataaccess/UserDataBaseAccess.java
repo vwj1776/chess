@@ -85,6 +85,9 @@ public class UserDataBaseAccess implements DataAccess {
 
     @Override
     public UserResponse addUser(UserData user) throws ResponseException, DataAccessException {
+        if (user == null || user.username() == null || user.password() == null || user.email() == null) {
+            throw new ResponseException(400, "Missing fields");
+        }
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
         return executeAddUser(statement, user.username(), user.password(), user.email());
     }
