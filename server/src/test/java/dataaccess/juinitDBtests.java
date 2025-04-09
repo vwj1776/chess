@@ -30,7 +30,7 @@ public class juinitDBtests {
         UserData user1 = new UserData("bob", "pass", "bob@mail.com");
         dao.addUser(user1);
         UserData user2 = new UserData("bob", "diffpass", "bob2@mail.com");
-        assertThrows(DataAccessException.class, () -> dao.addUser(user2));
+        assertThrows(ResponseException.class, () -> dao.addUser(user2));
     }
 
     @Test
@@ -58,6 +58,43 @@ public class juinitDBtests {
     }
 
     @Test
+    void createGame_negative_invalidToken() {
+        assertThrows(ResponseException.class, () -> dao.createGame("Bad Game", "fake-token"));
+    }
+
+    @Test
+    void joinGame_positive() throws Exception {
+        UserData user = new UserData("ellen", "pw", "ellen@mail.com");
+        dao.addUser(user);
+        String token = dao.addAuthToken(user);
+        String gameId = dao.createGame("Join Game", token);
+        boolean success = dao.joinGame(token, gameId, "WHITE");
+        assertTrue(success);
+    }
+
+    @Test
+    void joinGame_negative_invalidColor() throws Exception {
+        UserData user = new UserData("frank", "pw", "frank@mail.com");
+        dao.addUser(user);
+        String token = dao.addAuthToken(user);
+        String gameId = dao.createGame("Oops Game", token);
+        assertThrows(IllegalArgumentException.class, () -> dao.joinGame(token, gameId, "PURPLE"));
+    }
+
+    @Test
+    void validateAuthToken_positive() throws Exception {
+        UserData user = new UserData("gina", "pw", "gina@mail.com");
+        dao.addUser(user);
+        String token = dao.addAuthToken(user);
+        assertTrue(dao.validateAuthToken(token));
+    }
+
+    @Test
+    void validateAuthToken_negative() {
+        assertFalse(dao.validateAuthToken("invalid-token"));
+    }
+
+    @Test
     void listGames_positive() throws Exception {
         UserData user = new UserData("harry", "pw", "harry@mail.com");
         dao.addUser(user);
@@ -73,5 +110,11 @@ public class juinitDBtests {
         assertThrows(ResponseException.class, () -> dao.listGames("fake-token"));
     }
 
-
+    @Test
+    void clear_positive() throws Exception {
+        UserData user = new UserData("ivy", "pw", "ivy@mail.com");
+        dao.addUser(user);
+        dao.clear();
+        assertNull(dao.getUser("ivy"));
+    }
 }
