@@ -17,6 +17,7 @@ import static java.sql.Statement.RETURN_GENERATED_KEYS;
 public class UserDataBaseAccess implements DataAccess {
 
     public UserDataBaseAccess() throws ResponseException, DataAccessException {
+        System.out.println("in userDatabase");
         configureDatabase();
     }
 

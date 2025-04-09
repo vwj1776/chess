@@ -12,12 +12,16 @@ public class Main {
         System.out.println("♕ 240 Chess Server: " + piece);
 
         try {
+            System.out.println("in try");
+
             var port = 8080;
             if (args.length >= 1) {
                 port = Integer.parseInt(args[0]);
             }
 
             DataAccess dataAccess = new MemoryDataAccess();
+            System.out.println("before if");
+
             if (args.length >= 2 && args[1].equals("sql")) {
                 dataAccess = new UserDataBaseAccess();
             }
