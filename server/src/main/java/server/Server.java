@@ -22,19 +22,21 @@ public class Server {
 
     private final DataAccess dataAccess;
 
-    // Default constructor used by tests
     public Server() {
         try {
-            this.dataAccess = new MemoryDataAccess(); // or UserDataBaseAccess() if required
+            this.dataAccess = new MemoryDataAccess();
+            this.service = new ChessService(this.dataAccess);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize default DataAccess", e);
         }
     }
 
-    // Constructor used in your main method for full control
+
     public Server(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
+        this.service = new ChessService(this.dataAccess);
     }
+
 
 
 
