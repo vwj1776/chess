@@ -352,12 +352,13 @@ public class UserDataBaseAccess implements DataAccess {
 
             String statement = "UPDATE GameData SET " + column + " = ? WHERE gameID = ?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, getUsernameFromAuth(authToken)); // Get from your auth table
+                ps.setString(1, getUsernameFromAuth(authToken)); // From AuthData
                 ps.setInt(2, Integer.parseInt(gameID));
-                ps.executeUpdate();
-            }
 
-            return true;
+                int updated = ps.executeUpdate();
+
+                return updated > 0;
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

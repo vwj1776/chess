@@ -19,6 +19,7 @@ public class Main {
 
             DataAccess dataAccess = new MemoryDataAccess();
             if (args.length >= 2 && args[1].equalsIgnoreCase("sql")) {
+                System.out.println("using Db");
                 dataAccess = new UserDataBaseAccess();
             }
 
