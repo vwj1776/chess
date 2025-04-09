@@ -48,8 +48,8 @@ public class UserDataBaseAccess implements DataAccess {
 
 
     private void configureDatabase() throws ResponseException, DataAccessException {
-        DatabaseManager01.createDatabase();
-        try (var conn = DatabaseManager01.getConnection()) {
+        DatabaseManager.createDatabase();
+        try (var conn = DatabaseManager.getConnection()) {
             for (var statement : createStatements) {
                 try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
@@ -70,7 +70,7 @@ public class UserDataBaseAccess implements DataAccess {
         String authToken = AuthData.generateToken();
         var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
 
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement)) {
             ps.setString(1, authToken);
             ps.setString(2, user.username());
@@ -98,7 +98,7 @@ public class UserDataBaseAccess implements DataAccess {
         if(getUser(username) != null){
             throw new DataAccessException("Username already in database:" + username);
         }
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
             ps.setString(2, password);
@@ -118,7 +118,7 @@ public class UserDataBaseAccess implements DataAccess {
     public UserData getUser(String username) throws ResponseException {
         var statement = "SELECT username, password, email FROM UserData WHERE username = ?";
 
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement)) {
 
             ps.setString(1, username);
@@ -165,7 +165,7 @@ public class UserDataBaseAccess implements DataAccess {
             }
         }
 
-        throw new ResponseException(401, "Invalid login");
+        throw new ResponseException(4, "Invalid login");
     }
 
 
@@ -182,7 +182,7 @@ public class UserDataBaseAccess implements DataAccess {
 
     public void addGame(GameData gameData) throws ResponseException {
         var statement = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)";
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
             ps.setInt(1, gameData.gameID());
             ps.setString(2, gameData.whiteUsername());
@@ -200,7 +200,7 @@ public class UserDataBaseAccess implements DataAccess {
 
     private void executeCreatGame(String statement, String gameName, String authToken) throws ResponseException, DataAccessException {
 
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
             ps.setString(1, gameName);
 
@@ -218,7 +218,7 @@ public class UserDataBaseAccess implements DataAccess {
 //    public String createGame(String gameName, String authToken) throws ResponseException, DataAccessException {
 //        var statement = "INSERT INTO GameData (gameName, game) VALUES (?, ?)";
 //
-//        try (var conn = DatabaseManager01.getConnection();
+//        try (var conn = DatabaseManager.getConnection();
 //             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
 //
 //            ps.setString(1, gameName);
@@ -227,7 +227,7 @@ public class UserDataBaseAccess implements DataAccess {
 //            ps.executeUpdate();
 //
 //            if (!validateAuthToken(authToken)) {
-//                throw new ResponseException(401, "invalid authtoken");
+//                throw new ResponseException(4, "invalid authtoken");
 //            }
 //
 //            try (var rs = ps.getGeneratedKeys()) {
@@ -246,12 +246,12 @@ public class UserDataBaseAccess implements DataAccess {
     @Override
     public String createGame(String gameName, String authToken) throws ResponseException, DataAccessException {
         if (!validateAuthToken(authToken)) {
-            throw new ResponseException(401, "Invalid auth token");
+            throw new ResponseException(4, "Invalid auth token");
         }
 
         var statement = "INSERT INTO GameData (gameName, game) VALUES (?, ?)";
 
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, gameName);
@@ -278,7 +278,7 @@ public class UserDataBaseAccess implements DataAccess {
     public boolean validateAuthToken(String authToken) {
         var sql = "SELECT authToken FROM AuthData WHERE authToken = ?";
 
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
             ps.setString(1, authToken);
 
@@ -299,7 +299,7 @@ public class UserDataBaseAccess implements DataAccess {
         var games = new ArrayList<GameData>();
         var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData";
 
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement);
              var rs = ps.executeQuery()) {
 
@@ -329,7 +329,7 @@ public class UserDataBaseAccess implements DataAccess {
 
     @Override
     public void clear() {
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var stmt = conn.createStatement()) {
             stmt.executeUpdate("DELETE FROM AuthData");
             stmt.executeUpdate("DELETE FROM GameData");
@@ -342,7 +342,7 @@ public class UserDataBaseAccess implements DataAccess {
 
     @Override
     public boolean joinGame(String authToken, String gameID, String playerColor) {
-        try (var conn = DatabaseManager01.getConnection()) {
+        try (var conn = DatabaseManager.getConnection()) {
             String column = switch (playerColor.toUpperCase()) {
                 case "WHITE" -> "whiteUsername";
                 case "BLACK" -> "blackUsername";
@@ -366,7 +366,7 @@ public class UserDataBaseAccess implements DataAccess {
 
     private String getUsernameFromAuth(String token) throws SQLException, DataAccessException {
         var sql = "SELECT username FROM AuthData WHERE authToken = ?";
-        try (var conn = DatabaseManager01.getConnection();
+        try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
             ps.setString(1, token);
             try (var rs = ps.executeQuery()) {

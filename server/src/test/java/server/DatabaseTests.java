@@ -89,21 +89,21 @@ public class DatabaseTests {
         executeForAllTables(this::checkTableForPassword);
     }
 
-    private int getDatabaseRows() {
-        AtomicInteger rows = new AtomicInteger();
-        executeForAllTables((tableName, connection) -> {
-            try (var statement = connection.createStatement()) {
-                var sql = "SELECT count(*) FROM " + tableName;
-                try (var resultSet = statement.executeQuery(sql)) {
-                    if (resultSet.next()) {
-                        rows.addAndGet(resultSet.getInt(1));
-                    }
-                }
-            }
-        });
-
-        return rows.get();
-    }
+//    private int getDatabaseRows() {
+//        AtomicInteger rows = new AtomicInteger();
+//        executeForAllTables((tableName, connection) -> {
+//            try (var statement = connection.createStatement()) {
+//                var sql = "SELECT count(*) FROM " + tableName;
+//                try (var resultSet = statement.executeQuery(sql)) {
+//                    if (resultSet.next()) {
+//                        rows.addAndGet(resultSet.getInt(1));
+//                    }
+//                }
+//            }
+//        });
+//
+//        return rows.get();
+//    }
 
     private void checkTableForPassword(String table, Connection connection) throws SQLException {
         String sql = "SELECT * FROM " + table;
@@ -169,5 +169,25 @@ public class DatabaseTests {
     private static interface TableAction {
         void execute(String tableName, Connection connection) throws SQLException;
     }
+
+    private int getDatabaseRows() {
+        AtomicInteger rows = new AtomicInteger();
+        executeForAllTables((tableName, connection) -> {
+            System.out.println("▶ Table found: " + tableName);
+            try (var statement = connection.createStatement()) {
+                var sql = "SELECT count(*) FROM " + tableName;
+                try (var resultSet = statement.executeQuery(sql)) {
+                    if (resultSet.next()) {
+                        int count = resultSet.getInt(1);
+                        System.out.println("▶ Rows in " + tableName + ": " + count);
+                        rows.addAndGet(count);
+                    }
+                }
+            }
+        });
+
+        return rows.get();
+    }
+
 
 }

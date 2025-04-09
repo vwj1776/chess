@@ -16,13 +16,28 @@ import service.ChessService;
 import java.util.*;
 
 public class Server {
-    private final DataAccess dataAccess = new MemoryDataAccess();
-    private final ChessService service = new ChessService(dataAccess);
+    private ChessService service;
     public int port;
 
+
+    private final DataAccess dataAccess;
+
+    // Default constructor used by tests
     public Server() {
-        // webSocketHandler = new WebSocketHandler();
+        try {
+            this.dataAccess = new MemoryDataAccess(); // or UserDataBaseAccess() if required
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize default DataAccess", e);
+        }
     }
+
+    // Constructor used in your main method for full control
+    public Server(DataAccess dataAccess) {
+        this.dataAccess = dataAccess;
+    }
+
+
+
 
     public int getPort(){
         return port;
