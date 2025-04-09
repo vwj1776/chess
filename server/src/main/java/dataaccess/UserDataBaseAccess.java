@@ -96,22 +96,28 @@ public class UserDataBaseAccess implements DataAccess {
     }
 
     private UserResponse executeAddUser(String statement, String username, String password, String email) throws ResponseException, DataAccessException {
+
         if (getUser(username) != null) {
             throw new DataAccessException("Username already in database:" + username);
         }
+
+        String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
+
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-            ps.setString(1, username);
-            ps.setString(2, BCrypt.hashpw(password, BCrypt.gensalt())); // 👈 hashed password
-            ps.setString(3, email);
 
+            ps.setString(1, username);
+            ps.setString(2, hashedPassword);
+            ps.setString(3, email);
             ps.executeUpdate();
+
+            return new UserResponse(username, addAuthToken(new UserData(username, hashedPassword, email)));
 
         } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, String.format("Unable to add user: %s", e.getMessage()));
         }
-        return null;
     }
+
 
 
 
