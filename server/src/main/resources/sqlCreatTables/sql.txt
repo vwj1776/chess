@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS GameData (
     game BLOB NOT NULL
 );
 
-CREATE TABLE user_data (
+CREATE TABLE UserData (
     username VARCHAR(255) PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL

@@ -60,6 +60,7 @@ public class DatabaseTests {
 
         Assertions.assertTrue(initialRowCount < getDatabaseRows(), "No new data added to database");
 
+
         // Test that we can read the data after a restart
         stopServer();
         startServer();

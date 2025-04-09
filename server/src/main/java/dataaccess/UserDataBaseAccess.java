@@ -138,6 +138,7 @@ public class UserDataBaseAccess implements DataAccess {
         } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, String.format("Unable to find user: %s", e.getMessage()));
         }
+
     }
 
 //    @Override
