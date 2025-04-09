@@ -188,9 +188,22 @@ public class UserDataBaseAccess implements DataAccess {
     }
 
     @Override
-    public void logout(String authToken) throws Exception {
+    public void logout(String authToken) throws ResponseException {
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("DELETE FROM AuthToken WHERE token = ?")) {
 
+            ps.setString(1, authToken);
+            int affected = ps.executeUpdate();
+
+            if (affected == 0) {
+                throw new ResponseException(401, "Invalid auth token");
+            }
+
+        } catch (SQLException | DataAccessException e) {
+            throw new ResponseException(500, "Unable to logout: " + e.getMessage());
+        }
     }
+
 
 
 
