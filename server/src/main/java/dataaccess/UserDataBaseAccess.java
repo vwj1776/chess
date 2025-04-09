@@ -256,7 +256,7 @@ public class UserDataBaseAccess implements DataAccess {
              var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, gameName);
-            ps.setString(2, new Gson().toJson(new ChessGame())); // Save default game state
+            ps.setString(2, new Gson().toJson(new ChessGame())); // Save default
 
             ps.executeUpdate();
 
@@ -295,7 +295,11 @@ public class UserDataBaseAccess implements DataAccess {
 
     @Override
     public Collection<GameData> listGames(String authToken) throws ResponseException {
-        validateAuthToken(authToken);
+        if (!validateAuthToken(authToken)) {
+            throw new ResponseException(401, "Invalid auth token");
+        }
+
+
 
         var games = new ArrayList<GameData>();
         var statement = "SELECT gameID, whiteUsername, blackUsername, gameName, game FROM GameData";
@@ -343,6 +347,9 @@ public class UserDataBaseAccess implements DataAccess {
 
     @Override
     public boolean joinGame(String authToken, String gameID, String playerColor) {
+        if (!playerColor.equalsIgnoreCase("WHITE") && !playerColor.equalsIgnoreCase("BLACK")) {
+            throw new IllegalArgumentException("Invalid player color: " + playerColor);
+        }
         try (var conn = DatabaseManager.getConnection()) {
             String column = switch (playerColor.toUpperCase()) {
                 case "WHITE" -> "whiteUsername";

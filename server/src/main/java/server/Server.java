@@ -3,10 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dataaccess.DataAccess;
-import dataaccess.MemoryDataAccess;
-import dataaccess.ResponseException;
-import dataaccess.UserResponse;
+import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -24,7 +21,8 @@ public class Server {
 
     public Server() {
         try {
-            this.dataAccess = new MemoryDataAccess();
+            // this.dataAccess = new MemoryDataAccess();
+            this.dataAccess = new UserDataBaseAccess();
             this.service = new ChessService(this.dataAccess);
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize default DataAccess", e);
