@@ -1,6 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
+import dataaccess.GameListResponse;
 import dataaccess.GameResponse;
 import dataaccess.ResponseException;
 import model.UserData;
@@ -116,10 +117,12 @@ public class ServerFacade {
     }
 
 
-    public List<GameData> listGames(String authToken) throws Exception {
-        // TODO: Implement HTTP GET to /game
-        return null;
+    public List<GameData> listGames(String authToken) throws ResponseException {
+        var headers = Map.of("Authorization", authToken);
+        GameListResponse response = this.makeRequest("GET", "/game", null, headers, GameListResponse.class);
+        return response.getGames();
     }
+
 
     public void joinGame(String authToken, String gameId, String playerColor) throws Exception {
         // TODO: Implement HTTP PUT to /game
