@@ -2,14 +2,13 @@ package dataaccess;
 
 import model.UserData;
 import model.GameData;
-import chess.ChessGame;
 import org.junit.jupiter.api.*;
 
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class juinitDBtests {
+public class DatabaseTests {
 
     private static UserDataBaseAccess dao;
 
