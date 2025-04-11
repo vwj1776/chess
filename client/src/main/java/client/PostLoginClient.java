@@ -3,7 +3,7 @@ package client;
 import client.UIClient;
 import client.ServerFacade;
 
-public class PreloginClient implements UIClient {
+public class PostLoginClient implements UIClient {
     @Override
     public String eval(String input) {
         return "";
@@ -13,5 +13,4 @@ public class PreloginClient implements UIClient {
     public String help() {
         return "";
     }
-    // constructor, fields, eval(), help()...
 }
