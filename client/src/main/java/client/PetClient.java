@@ -1,12 +1,12 @@
 package client;
 
-import client.websocket.NotificationHandler;
-import client.websocket.WebSocketFacade;
+//import client.websocket.NotificationHandler;
+//import client.websocket.WebSocketFacade;
 import com.google.gson.Gson;
 import exception.ResponseException;
 import model.Pet;
 import model.PetType;
-import server.ServerFacade;
+import server.*;
 
 import java.util.Arrays;
 
@@ -14,14 +14,12 @@ public class PetClient {
     private String visitorName = null;
     private final ServerFacade server;
     private final String serverUrl;
-    private final NotificationHandler notificationHandler;
     private WebSocketFacade ws;
     private State state = State.SIGNEDOUT;
 
-    public PetClient(String serverUrl, NotificationHandler notificationHandler) {
+    public PetClient(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.notificationHandler = notificationHandler;
     }
 
     public String eval(String input) {

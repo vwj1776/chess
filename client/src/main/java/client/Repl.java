@@ -1,17 +1,14 @@
 package client;
 
-import client.websocket.NotificationHandler;
-import webSocketMessages.Notification;
-
 import java.util.Scanner;
 
-import static client.EscapeSequences.*;
+import static ui.EscapeSequences.*;
 
-public class Repl implements NotificationHandler {
+public class Repl {
     private final PetClient client;
 
     public Repl(String serverUrl) {
-        client = new PetClient(serverUrl, this);
+        client = new PetClient(serverUrl);
     }
 
     public void run() {
@@ -35,10 +32,6 @@ public class Repl implements NotificationHandler {
         System.out.println();
     }
 
-    public void notify(Notification notification) {
-        System.out.println(RED + notification.message());
-        printPrompt();
-    }
 
     private void printPrompt() {
         System.out.print("\n" + RESET + ">>> " + GREEN);
