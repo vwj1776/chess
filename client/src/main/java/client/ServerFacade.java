@@ -52,9 +52,45 @@ public class ServerFacade {
     }
 
 
-    public UserResponse login(String username, String password) throws Exception {
-        // TODO: Implement HTTP POST to /session
-        return null;
+    public UserResponse login(String username, String password) throws ResponseException {
+        var path = "/session";
+        var request = new UserData(username, password, null);
+        return this.makeRequest("POST", path, request, UserResponse.class);
+    }
+
+
+    protected <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+        try {
+            URL url = new URL(serverUrl + path);
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod(method);
+            http.setDoOutput(true);
+            http.setRequestProperty("Content-Type", "application/json");
+
+            if (request != null) {
+                try (var body = http.getOutputStream()) {
+                    String json = gson.toJson(request);
+                    body.write(json.getBytes());
+                }
+            }
+
+            if (http.getResponseCode() == 200) {
+                try (var reader = new InputStreamReader(http.getInputStream())) {
+                    return gson.fromJson(reader, responseClass);
+                }
+            } else {
+                try (var reader = new InputStreamReader(http.getErrorStream())) {
+                    var error = gson.fromJson(reader, ErrorResponse.class);
+                    throw new ResponseException(http.getResponseCode(), error.message);
+                }
+            }
+        } catch (IOException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    private static class ErrorResponse {
+        public String message;
     }
 
     public void logout(String authToken) throws Exception {

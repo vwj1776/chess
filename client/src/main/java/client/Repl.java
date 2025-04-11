@@ -1,18 +1,22 @@
 package client;
 
 import java.util.Scanner;
-
 import static ui.EscapeSequences.*;
 
 public class Repl {
-    private final ChessClient client;
+    private final ServerFacade server;
+    private UIClient client;
+    private final ChessClient mainClient;
+
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl);
+        this.server = new ServerFacade(serverUrl);
+        this.mainClient = new ChessClient(server, this); // pass facade + Repl to allow switching client
+        this.client = new PreLoginClient(server, mainClient);
     }
 
     public void run() {
-        System.out.println("♕ Welcome to CHESS! Sign in or register to start.");
+        System.out.println("♕ Welcome to CHESS! Sign in or register to start you heathen");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);
@@ -28,7 +32,7 @@ public class Repl {
                 System.out.print(RED + "Unexpected error: " + e.getMessage() + RESET);
             }
         }
-        System.out.println("\nGoodbye!");
+        System.out.println("\nGoodbye! (you heathen)");
     }
 
     private void printPrompt() {
