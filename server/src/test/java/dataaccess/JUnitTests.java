@@ -8,7 +8,7 @@ import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DatabaseTests {
+public class JUnitTests {
 
     private static UserDataBaseAccess dao;
 
