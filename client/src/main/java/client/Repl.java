@@ -11,7 +11,7 @@ public class Repl {
 
     public Repl(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
-        this.mainClient = new ChessClient(server, this); // pass facade + Repl to allow switching client
+        this.mainClient = new ChessClient(server, this);
         this.client = new PreLoginClient(server, mainClient);
     }
 

@@ -1,17 +1,15 @@
 package client;
 
-
 public class ChessClient {
 
     private final ServerFacade server;
     private String authToken = null;
     private UIClient currentClient;
 
-    public ChessClient(String serverUrl, Repl repl) {
-        this.server = new ServerFacade(serverUrl);
+    public ChessClient(ServerFacade server, Repl repl) {
+        this.server = server;
         this.currentClient = new PreLoginClient(server, this);
     }
-
 
     public String eval(String input) {
         return currentClient.eval(input);
