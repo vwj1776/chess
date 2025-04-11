@@ -1,11 +1,15 @@
 package client;
 
 import com.google.gson.Gson;
+import dataaccess.ResponseException;
 import model.UserData;
 import model.GameData;
 import model.AuthData;
 import dataaccess.UserResponse;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -75,7 +79,32 @@ public class ServerFacade {
         // TODO: Implement observe logic, same as joinGame but no color
     }
 
-    public void clear() throws Exception {
-        // TODO: Implement HTTP DELETE to /db
+    public void clear() throws ResponseException, IOException {
+        var url = new URL(serverUrl + "/db");
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("DELETE");
+
+        var status = http.getResponseCode();
+        if (status != 200) {
+            throw new ResponseException(status, readResponseBody(http));
+        }
     }
+
+    private String readResponseBody(HttpURLConnection http) throws IOException {
+        var inputStream = http.getErrorStream();
+        if (inputStream == null) {
+            inputStream = http.getInputStream();
+        }
+
+        try (var reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            var response = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+            return response.toString();
+        }
+    }
+
+
 }
