@@ -47,6 +47,36 @@ public class ServerFacadeTests {
     }
 
     @Test
+    void login_positive() throws Exception {
+        facade.clear();
+        var registered = facade.register("loginUser", "password", "login@email.com");
+        var loggedIn = facade.login("loginUser", "password");
+
+        assertNotNull(loggedIn.getAuthToken());
+        assertEquals("loginUser", loggedIn.getUsername());
+    }
+
+    @Test
+    void login_negative_wrongPassword() throws Exception {
+        facade.clear();
+        facade.register("wrongPassUser", "correctPass", "user@email.com");
+
+        var exception = assertThrows(ResponseException.class, () ->
+                facade.login("wrongPassUser", "wrongPass")
+        );
+        assertEquals(401, exception.getStatusCode());
+    }
+
+    @Test
+    void login_negative_nonexistentUser() {
+        var exception = assertThrows(ResponseException.class, () ->
+                facade.login("ghostUser", "noPass")
+        );
+        assertEquals(401, exception.getStatusCode());
+    }
+
+
+    @Test
     void createGame_positive() throws Exception {
         var auth = facade.register("gamer1", "password", "gamer1@email.com");
         String gameId = facade.createGame("EpicBattle", auth.getAuthToken());
@@ -87,8 +117,19 @@ public class ServerFacadeTests {
         assertThrows(ResponseException.class, () -> facade.listGames("bad-token"));
     }
 
+    @Test
+    void logout_negative_invalidToken() {
+        var exception = assertThrows(ResponseException.class, () ->
+                facade.logout("not-a-real-token")
+        );
+        assertEquals(401, exception.getStatusCode());
+    }
 
+    @Test
+    void logout_positive() throws Exception {
+        facade.clear();
+        var auth = facade.register("logoutUser", "password", "logout@email.com");
 
-
-
+        assertDoesNotThrow(() -> facade.logout(auth.getAuthToken()));
+    }
 }

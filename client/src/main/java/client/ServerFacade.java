@@ -108,7 +108,15 @@ public class ServerFacade {
     }
 
     public void logout(String authToken) throws Exception {
-        // TODO: Implement HTTP DELETE to /session
+        var url = new URL(serverUrl + "/session");
+        HttpURLConnection http = (HttpURLConnection) url.openConnection();
+        http.setRequestMethod("DELETE");
+        http.setRequestProperty("Authorization", authToken);
+
+        var status = http.getResponseCode();
+        if (status != 200) {
+            throw new ResponseException(status, readResponseBody(http));
+        }
     }
 
     public String createGame(String gameName, String authToken) throws ResponseException {
@@ -125,7 +133,14 @@ public class ServerFacade {
 
 
     public void joinGame(String authToken, String gameId, String playerColor) throws Exception {
-        // TODO: Implement HTTP PUT to /game
+        var path = "/game";
+        var request = Map.of(
+                "gameID", gameId,
+                "playerColor", playerColor
+        );
+        var headers = Map.of("Authorization", authToken);
+
+        makeRequest("PUT", path, request, headers, Void.class);
     }
 
     public void observeGame(String authToken, String gameId) throws Exception {
