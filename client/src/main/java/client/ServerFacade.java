@@ -6,6 +6,9 @@ import model.GameData;
 import model.AuthData;
 import dataaccess.UserResponse;
 
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 import java.util.List;
 
 public class ServerFacade {
@@ -18,9 +21,32 @@ public class ServerFacade {
     }
 
     public UserResponse register(String username, String password, String email) throws Exception {
-        // TODO: Implement HTTP POST to /user
-        return null;
+        var url = new URL(serverUrl + "/user");
+        var connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
+
+        var requestBody = gson.toJson(new UserData(username, password, email));
+        try (var outputStream = connection.getOutputStream()) {
+            outputStream.write(requestBody.getBytes());
+        }
+
+        var status = connection.getResponseCode();
+        if (status == 200) {
+            try (var input = connection.getInputStream()) {
+                var responseBody = new String(input.readAllBytes());
+                return gson.fromJson(responseBody, UserResponse.class);
+            }
+        } else {
+            try (var error = connection.getErrorStream()) {
+                var errorMessage = new String(error.readAllBytes());
+                throw new RuntimeException("Error: " + errorMessage);
+            }
+        }
     }
+
 
     public UserResponse login(String username, String password) throws Exception {
         // TODO: Implement HTTP POST to /session
