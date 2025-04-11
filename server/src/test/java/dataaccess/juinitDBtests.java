@@ -20,7 +20,7 @@ public class juinitDBtests {
     }
 
     @Test
-    void addUser_positive() throws Exception {
+    void addUser_positive() {
         UserData user = new UserData("alice", "password123", "alice@mail.com");
         assertDoesNotThrow(() -> dao.addUser(user));
     }
@@ -109,6 +109,64 @@ public class juinitDBtests {
     void listGames_negative_invalidToken() {
         assertThrows(ResponseException.class, () -> dao.listGames("fake-token"));
     }
+
+    @Test
+    void addAuthToken_positive() throws Exception {
+        UserData user = new UserData("authme", "pw", "authme@mail.com");
+        dao.addUser(user);
+        String token = dao.addAuthToken(user);
+        assertNotNull(token);
+        assertTrue(token.length() > 0);
+    }
+
+    @Test
+    void addAuthToken_negative_userDoesNotExist() {
+        UserData fakeUser = new UserData("ghost", "pw", "ghost@mail.com");
+
+        DataAccessException exception = assertThrows(DataAccessException.class, () -> dao.addAuthToken(fakeUser));
+        assertTrue(exception.getMessage().contains("User does not exist"));
+    }
+
+
+    @Test
+    void login_positive() throws Exception {
+        UserData user = new UserData("testUser", "securePassword", "test@mail.com");
+        dao.addUser(user);
+
+        UserResponse response = dao.login("testUser", "securePassword");
+
+        assertNotNull(response);
+        assertEquals("testUser", response.getUsername());
+        assertNotNull(response.getAuthToken());
+    }
+
+    @Test
+    void login_negative_wrongPassword() throws Exception {
+        UserData user = new UserData("badUser", "rightPassword", "bad@mail.com");
+        dao.addUser(user);
+
+        assertThrows(ResponseException.class, () -> dao.login("badUser", "wrongPassword"));
+    }
+
+    @Test
+    void logout_positive() throws Exception {
+        UserData user = new UserData("logoutUser", "pw123", "logout@mail.com");
+        dao.addUser(user);
+        String token = dao.addAuthToken(user);
+
+        // dont  throw pls
+        assertDoesNotThrow(() -> dao.logout(token));
+    }
+
+    @Test
+    void logout_negative_invalidToken() {
+        String fakeToken = "nonexistent-token";
+
+        ResponseException exception = assertThrows(ResponseException.class, () -> dao.logout(fakeToken));
+        assertEquals(401, exception.getStatusCode());
+    }
+
+
 
     @Test
     void clear_positive() throws Exception {

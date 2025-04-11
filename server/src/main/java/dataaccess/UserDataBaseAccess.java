@@ -60,27 +60,34 @@ public class UserDataBaseAccess implements DataAccess {
         }
     }
 
-
-
-//    public AuthData getAuthToken(){
-//
-//    }
-
     public String addAuthToken(UserData user) throws DataAccessException {
         String authToken = AuthData.generateToken();
-        var statement = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
 
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement)) {
-            ps.setString(1, authToken);
-            ps.setString(2, user.username());
-            ps.executeUpdate();
+        try (var conn = DatabaseManager.getConnection()) {
+            String checkUser = "SELECT username FROM UserData WHERE username = ?";
+            try (var checkStmt = conn.prepareStatement(checkUser)) {
+                checkStmt.setString(1, user.username());
+                try (var rs = checkStmt.executeQuery()) {
+                    if (!rs.next()) {
+                        throw new DataAccessException("User does not exist: " + user.username(), null);
+                    }
+                }
+            }
+
+            String insertToken = "INSERT INTO AuthData (authToken, username) VALUES (?, ?)";
+            try (var insertStmt = conn.prepareStatement(insertToken)) {
+                insertStmt.setString(1, authToken);
+                insertStmt.setString(2, user.username());
+                insertStmt.executeUpdate();
+            }
+
         } catch (SQLException e) {
             throw new DataAccessException("Unable to add auth token: " + e.getMessage(), e);
         }
 
         return authToken;
     }
+
 
 
     @Override
@@ -93,11 +100,6 @@ public class UserDataBaseAccess implements DataAccess {
 //        }
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
         return executeAddUser(statement, user.username(), user.password(), user.email());
-    }
-
-    public void createUser(UserData user) throws ResponseException, DataAccessException {
-        var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
-        executeAddUser(statement, user.username(), user.password(), user.email());
     }
 
     private UserResponse executeAddUser(String statement, String username, String password, String email) throws ResponseException, DataAccessException {
@@ -153,19 +155,6 @@ public class UserDataBaseAccess implements DataAccess {
         }
     }
 
-
-//    @Override
-//    public UserResponse login(String username, String password) throws ResponseException {
-//        UserData user = getUser(username);
-//        UserResponse response = null;
-//
-//
-//        if(Objects.equals(user.password(), password)){
-//            response = new UserResponse(username, createAuthtoken());
-//        }
-//        return response;
-//    }
-
     @Override
     public UserResponse login(String username, String password) throws ResponseException, DataAccessException {
         UserData user = getUser(username);
@@ -180,14 +169,6 @@ public class UserDataBaseAccess implements DataAccess {
         } catch (DataAccessException e) {
             throw new ResponseException(500, "Unable to generate auth token");
         }
-    }
-
-
-
-
-
-    public String createAuthtoken(){
-        return AuthData.generateToken();
     }
 
     @Override
@@ -211,73 +192,6 @@ public class UserDataBaseAccess implements DataAccess {
         }
     }
 
-
-
-
-
-
-    public void addGame(GameData gameData) throws ResponseException {
-        var statement = "INSERT INTO GameData (gameID, whiteUsername, blackUsername, gameName, game) VALUES(?, ?, ?, ?, ?)";
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, gameData.gameID());
-            ps.setString(2, gameData.whiteUsername());
-            ps.setString(3, gameData.blackUsername());
-            ps.setString(4, gameData.gameName());
-            ps.setString(5, new Gson().toJson(gameData.game()));
-
-
-            ps.executeUpdate();
-
-        } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(500, String.format("Unable to add Game: %s", e.getMessage()));
-        }
-    }
-
-    private void executeCreatGame(String statement, String gameName, String authToken) throws ResponseException, DataAccessException {
-
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-            ps.setString(1, gameName);
-
-            ps.executeUpdate();
-            if(!validateAuthToken(authToken)){
-                throw new ResponseException(500, "invalid authtoken: %s");
-            }
-
-        } catch (SQLException | DataAccessException e) {
-            throw new ResponseException(500, String.format("Unable to add Game: %s", e.getMessage()));
-        }
-    }
-
-//    @Override
-//    public String createGame(String gameName, String authToken) throws ResponseException, DataAccessException {
-//        var statement = "INSERT INTO GameData (gameName, game) VALUES (?, ?)";
-//
-//        try (var conn = DatabaseManager.getConnection();
-//             var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-//
-//            ps.setString(1, gameName);
-//            ps.setString(2, new Gson().toJson(new ChessGame())); // Create a default game state
-//
-//            ps.executeUpdate();
-//
-//            if (!validateAuthToken(authToken)) {
-//                throw new ResponseException(4, "invalid authtoken");
-//            }
-//
-//            try (var rs = ps.getGeneratedKeys()) {
-//                if (rs.next()) {
-//                    return String.valueOf(rs.getInt(1)); // return the generated gameID
-//                }
-//            }
-//
-//            throw new ResponseException(500, "Failed to create game");
-//
-//        } catch (SQLException | DataAccessException e) {
-//            throw new ResponseException(500, String.format("Unable to add Game: %s", e.getMessage()));
-//        }
-//    }
 
     @Override
     public String createGame(String gameName, String authToken) throws ResponseException, DataAccessException {
@@ -403,7 +317,6 @@ public class UserDataBaseAccess implements DataAccess {
                 throw new ResponseException(401, "Invalid auth token");
             }
 
-            // ✅ Check if color is already taken
             String checkQuery = "SELECT " + column + " FROM GameData WHERE gameID = ?";
             try (var checkStmt = conn.prepareStatement(checkQuery)) {
                 checkStmt.setInt(1, Integer.parseInt(gameID));
@@ -419,7 +332,6 @@ public class UserDataBaseAccess implements DataAccess {
                 }
             }
 
-            // ✅ Now safe to insert
             String updateStmt = "UPDATE GameData SET " + column + " = ? WHERE gameID = ?";
             try (var ps = conn.prepareStatement(updateStmt)) {
                 ps.setString(1, username);
