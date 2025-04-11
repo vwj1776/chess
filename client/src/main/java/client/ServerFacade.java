@@ -1,6 +1,7 @@
 package client;
 
 import com.google.gson.Gson;
+import dataaccess.GameResponse;
 import dataaccess.ResponseException;
 import model.UserData;
 import model.GameData;
@@ -14,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import java.util.List;
+import java.util.Map;
 
 public class ServerFacade {
 
@@ -58,14 +60,24 @@ public class ServerFacade {
         return this.makeRequest("POST", path, request, UserResponse.class);
     }
 
-
     protected <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
+        return makeRequest(method, path, request, null, responseClass);
+    }
+
+
+    protected <T> T makeRequest(String method, String path, Object request, Map<String, String> headers, Class<T> responseClass) throws ResponseException {
         try {
             URL url = new URL(serverUrl + path);
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
             http.setRequestProperty("Content-Type", "application/json");
+
+            if (headers != null) {
+                for (var entry : headers.entrySet()) {
+                    http.setRequestProperty(entry.getKey(), entry.getValue());
+                }
+            }
 
             if (request != null) {
                 try (var body = http.getOutputStream()) {
@@ -89,6 +101,7 @@ public class ServerFacade {
         }
     }
 
+
     private static class ErrorResponse {
         public String message;
     }
@@ -97,10 +110,11 @@ public class ServerFacade {
         // TODO: Implement HTTP DELETE to /session
     }
 
-    public String createGame(String gameName, String authToken) throws Exception {
-        // TODO: Implement HTTP POST to /game
-        return null;
+    public String createGame(String gameName, String authToken) throws ResponseException {
+        var request = Map.of("gameName", gameName);
+        return makeRequest("POST", "/game", request, Map.of("Authorization", authToken), GameResponse.class).getGameID();
     }
+
 
     public List<GameData> listGames(String authToken) throws Exception {
         // TODO: Implement HTTP GET to /game

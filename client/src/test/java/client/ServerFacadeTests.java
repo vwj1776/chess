@@ -32,7 +32,6 @@ public class ServerFacadeTests {
     }
 
 
-
     @Test
     void register() throws Exception {
         var authData = facade.register("player1", "password", "p1@email.com");
