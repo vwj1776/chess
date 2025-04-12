@@ -58,14 +58,11 @@ public class ServerFacade {
     public UserResponse login(String username, String password) throws ResponseException {
         var path = "/session";
         var request = new UserData(username, password, null);
-        return this.makeRequest("POST", path, request, UserResponse.class);
-    }
-
-    protected <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ResponseException {
-        return makeRequest(method, path, request, null, responseClass);
+        return makeRequest("POST", "/session", request, null, UserResponse.class);
     }
 
 
+    @SuppressWarnings("unchecked")
     protected <T> T makeRequest(String method, String path, Object request, Map<String, String> headers, Class<T> responseClass) throws ResponseException {
         try {
             URL url = new URL(serverUrl + path);
@@ -87,20 +84,26 @@ public class ServerFacade {
                 }
             }
 
-            if (http.getResponseCode() == 200) {
+            int status = http.getResponseCode();
+            if (status == 200) {
+                if (responseClass == null || responseClass == Void.class) {
+                    return null;
+                }
                 try (var reader = new InputStreamReader(http.getInputStream())) {
                     return gson.fromJson(reader, responseClass);
                 }
             } else {
                 try (var reader = new InputStreamReader(http.getErrorStream())) {
                     var error = gson.fromJson(reader, ErrorResponse.class);
-                    throw new ResponseException(http.getResponseCode(), error.message);
+                    throw new ResponseException(status, error.message);
                 }
             }
         } catch (IOException ex) {
             throw new ResponseException(500, ex.getMessage());
         }
     }
+
+
 
 
     private static class ErrorResponse {
@@ -138,41 +141,10 @@ public class ServerFacade {
                 "playerColor", playerColor
         );
         var headers = Map.of("Authorization", authToken);
-        makeRequestWithoutResponse("PUT", "/game", request, headers);
+        makeRequest("PUT", "/game", request, headers, null);
     }
 
-    private void makeRequestWithoutResponse(String method, String path, Object request, Map<String, String> headers) throws ResponseException {
-        try {
-            URL url = new URL(serverUrl + path);
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-            http.setRequestMethod(method);
-            http.setDoOutput(true);
-            http.setRequestProperty("Content-Type", "application/json");
 
-            if (headers != null) {
-                for (var entry : headers.entrySet()) {
-                    http.setRequestProperty(entry.getKey(), entry.getValue());
-                }
-            }
-
-            if (request != null) {
-                try (var body = http.getOutputStream()) {
-                    String json = gson.toJson(request);
-                    body.write(json.getBytes());
-                }
-            }
-
-            int status = http.getResponseCode();
-            if (status != 200) {
-                try (var reader = new InputStreamReader(http.getErrorStream())) {
-                    var error = gson.fromJson(reader, ErrorResponse.class);
-                    throw new ResponseException(status, error.message);
-                }
-            }
-        } catch (IOException e) {
-            throw new ResponseException(500, e.getMessage());
-        }
-    }
 
 
     public void observeGame(String authToken, String gameId) throws Exception {
