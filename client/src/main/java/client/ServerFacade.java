@@ -133,15 +133,47 @@ public class ServerFacade {
 
 
     public void joinGame(String authToken, String gameId, String playerColor) throws Exception {
-        var path = "/game";
         var request = Map.of(
                 "gameID", gameId,
                 "playerColor", playerColor
         );
         var headers = Map.of("Authorization", authToken);
-
-        makeRequest("PUT", path, request, headers, Void.class);
+        makeRequestWithoutResponse("PUT", "/game", request, headers);
     }
+
+    private void makeRequestWithoutResponse(String method, String path, Object request, Map<String, String> headers) throws ResponseException {
+        try {
+            URL url = new URL(serverUrl + path);
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestMethod(method);
+            http.setDoOutput(true);
+            http.setRequestProperty("Content-Type", "application/json");
+
+            if (headers != null) {
+                for (var entry : headers.entrySet()) {
+                    http.setRequestProperty(entry.getKey(), entry.getValue());
+                }
+            }
+
+            if (request != null) {
+                try (var body = http.getOutputStream()) {
+                    String json = gson.toJson(request);
+                    body.write(json.getBytes());
+                }
+            }
+
+            int status = http.getResponseCode();
+            if (status != 200) {
+                try (var reader = new InputStreamReader(http.getErrorStream())) {
+                    var error = gson.fromJson(reader, ErrorResponse.class);
+                    throw new ResponseException(status, error.message);
+                }
+            }
+        } catch (IOException e) {
+            throw new ResponseException(500, e.getMessage());
+        }
+    }
+
 
     public void observeGame(String authToken, String gameId) throws Exception {
         // TODO: Implement observe logic, same as joinGame but no color
