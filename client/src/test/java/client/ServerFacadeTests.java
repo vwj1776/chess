@@ -150,5 +150,23 @@ public class ServerFacadeTests {
         assertEquals(401, ex.getStatusCode());
     }
 
+    @Test
+    void observeGame_positive() throws Exception {
+        var auth = facade.register("observer1", "password", "observer1@email.com");
+        var gameID = facade.createGame("Watch Me Game", auth.getAuthToken());
+        assertDoesNotThrow(() -> facade.observeGame(auth.getAuthToken(), gameID));
+    }
+
+    @Test
+    void observeGame_negative_invalidToken() throws Exception {
+        var auth = facade.register("observer2", "password", "observer2@email.com");
+        var gameID = facade.createGame("Private Game", auth.getAuthToken());
+
+        var badToken = "not-a-real-token";
+        var exception = assertThrows(ResponseException.class, () -> facade.observeGame(badToken, gameID));
+        assertEquals(401, exception.getStatusCode());
+    }
+
+
 
 }

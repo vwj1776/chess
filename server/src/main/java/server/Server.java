@@ -75,79 +75,87 @@ public class Server {
 
     private Object joinGame(Request req, Response res) {
         try {
-            // Extract auth token from header
             String authToken = req.headers("authorization");
-
-
-
-            // Parse JSON body
             JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();
-            if (body.get("playerColor") == null || body.get("playerColor").getAsString().isEmpty()) {
-                System.out.println("----------------------------------help " + body.get("gameID") + " ");
-                res.status(400);
-                throw new IllegalArgumentException("bad request");
-            }
-            if (!body.get("playerColor").getAsString().equalsIgnoreCase("black") && !body.get("playerColor").getAsString().equalsIgnoreCase("white") ) {
-                System.out.println("----------------------------------help " + body.get("gameID") + " ");
-                res.status(400);
-                throw new IllegalArgumentException("bad request, invalid player color");
-            }
-            String playerColor = body.get("playerColor").getAsString();
-            System.out.println("----------------------------------help " + body.get("gameID") + " ");
 
-            if (body.get("gameID") == null) {
-                System.out.println("----------------------------------help " + body.get("gameID") + " ");
-                res.status(400);
-                throw new IllegalArgumentException("bad request");
+            String gameID = extractGameID(body, res);
+            String playerColor = extractPlayerColor(body, res);
+
+            if (playerColor.equalsIgnoreCase("observer")) {
+                if (!service.validateAuthToken(authToken)) {
+                    throw new ResponseException(401, "Invalid auth token");
+                }
+                System.out.println("Observer joined game " + gameID);
+                res.status(200);
+                return "{}";
             }
 
-            String gameID = body.get("gameID").getAsString();
 
-            System.out.println("----------------------------------help " + gameID + " ");
-
-
-            // Call the joinGame function
             boolean success = service.joinGame(authToken, gameID, playerColor);
-
             if (success) {
-                res.status(200); // HTTP 200 OK
-                return "{}"; // Empty JSON response
+                res.status(200);
+                return "{}";
             } else {
-                res.status(500); // HTTP 500 Internal Server Error
-                return new Gson().toJson(Map.of("message", "Error: unknown error"));
+                res.status(500);
+                return errorJson("unknown error");
             }
 
         } catch (IllegalArgumentException e) {
-            String message = e.getMessage();
-            switch (message) {
-                case "unauthorized":
-                    res.status(401);
-                    break;
-                case "bad request":
-                    res.status(400);
-                    break;
-                case "bad request, invalid player color":
-                    res.status(400);
-                    break;
-                case "already taken":
-                    res.status(403);
-                    break;
-                default:
-                    res.status(500);
-                    break;
-            }
-            return new Gson().toJson(Map.of("message", "Error: " + message));
-        }
-        catch (ResponseException e) {
+            return handleIllegalArg(e, res);
+        } catch (ResponseException e) {
             res.status(e.getStatusCode());
-            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
-        }
-        catch (Exception e) {
+            return errorJson(e.getMessage());
+        } catch (Exception e) {
             res.status(500);
-            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
+            return errorJson(e.getMessage());
+        }
+    }
+    private String extractGameID(JsonObject body, Response res) {
+        if (!body.has("gameID") || body.get("gameID").isJsonNull() || body.get("gameID").getAsString().isBlank()) {
+            res.status(400);
+            throw new IllegalArgumentException("bad request");
+        }
+        return body.get("gameID").getAsString();
+    }
+
+    private String extractPlayerColor(JsonObject body, Response res) {
+        if (!body.has("playerColor") || body.get("playerColor").isJsonNull() || body.get("playerColor").getAsString().isBlank()) {
+            res.status(400);
+            throw new IllegalArgumentException("bad request");
         }
 
+        String color = body.get("playerColor").getAsString();
+        if (!color.equalsIgnoreCase("white") && !color.equalsIgnoreCase("black") && !color.equalsIgnoreCase("observer")) {
+            res.status(400);
+            throw new IllegalArgumentException("bad request, invalid player color");
+        }
+
+        return color;
     }
+
+    private boolean isObserver(String color) {
+        return color.equalsIgnoreCase("observer");
+    }
+
+    private void handleObserverJoin(String gameID) {
+        System.out.println("Observer joined game " + gameID);
+    }
+
+    private Object handleIllegalArg(IllegalArgumentException e, Response res) {
+        String message = e.getMessage();
+        switch (message) {
+            case "unauthorized" -> res.status(401);
+            case "bad request", "bad request, invalid player color" -> res.status(400);
+            case "already taken" -> res.status(403);
+            default -> res.status(500);
+        }
+        return errorJson(message);
+    }
+
+    private String errorJson(String message) {
+        return new Gson().toJson(Map.of("message", "Error: " + message));
+    }
+
 
 
     private Object clear(Request req, Response res) {

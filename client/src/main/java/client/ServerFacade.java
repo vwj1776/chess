@@ -145,11 +145,16 @@ public class ServerFacade {
     }
 
 
-
-
     public void observeGame(String authToken, String gameId) throws Exception {
-        // TODO: Implement observe logic, same as joinGame but no color
+        var request = Map.of(
+                "gameID", gameId,
+                "playerColor", "observer"
+        );
+        var headers = Map.of("Authorization", authToken);
+        makeRequest("PUT", "/game", request, headers, Void.class);
     }
+
+
 
     public void clear() throws ResponseException, IOException {
         var url = new URL(serverUrl + "/db");
