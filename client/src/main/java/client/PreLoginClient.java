@@ -22,6 +22,7 @@ public class PreLoginClient implements UIClient {
 
         return switch (command) {
             case "register" -> register(params);
+            case "login" -> login(params);
             case "help" -> help();
             case "quit" -> "Goodbye!";
             default -> "Unknown command. Type 'help' for options.";
@@ -47,11 +48,30 @@ public class PreLoginClient implements UIClient {
         return "Usage: register <username> <password> <email>";
     }
 
+    private String login(String... params) {
+        if (params.length == 2) {
+            var username = params[0];
+            var password = params[1];
+            try {
+                UserResponse response = server.login(username, password);
+                chessClient.setAuthToken(response.getAuthToken());
+                chessClient.promoteToPostLogin();
+                return String.format("Welcome back, %s! You are now logged in.", username);
+            } catch (ResponseException e) {
+                return "Error: " + e.getMessage();
+            } catch (Exception e) {
+                return "Unexpected error: " + e.getMessage();
+            }
+        }
+        return "Usage: login <username> <password>";
+    }
+
     @Override
     public String help() {
         return """
                 Pre-Login Commands:
                 - register <username> <password> <email>
+                - login <username> <password>
                 - help
                 - quit
                 """;

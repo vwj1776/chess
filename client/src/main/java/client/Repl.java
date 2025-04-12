@@ -17,7 +17,7 @@ public class Repl {
 
     public void run() {
         System.out.println("♕ Welcome to CHESS! Sign in or register to start you heathen");
-        System.out.print(client.help());
+        System.out.print(mainClient.help());
 
         Scanner scanner = new Scanner(System.in);
         String result = "";
@@ -26,7 +26,7 @@ public class Repl {
             String line = scanner.nextLine();
 
             try {
-                result = client.eval(line);
+                result = mainClient.eval(line);  // <-- always use mainClient
                 System.out.print(BLUE + result + RESET);
             } catch (Throwable e) {
                 System.out.print(RED + "Unexpected error: " + e.getMessage() + RESET);
@@ -34,6 +34,7 @@ public class Repl {
         }
         System.out.println("\nGoodbye! (you heathen)");
     }
+
 
     private void printPrompt() {
         System.out.print("\n" + RESET + ">>> " + GREEN);
