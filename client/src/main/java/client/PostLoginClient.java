@@ -1,16 +1,21 @@
 package client;
 
+import chess.ChessGame;
 import dataaccess.ResponseException;
 import model.GameData;
+import ui.BoardPrinter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 public class PostLoginClient implements UIClient {
 
     private final ServerFacade server;
     private final ChessClient mainClient;
     private final String authToken;
+    private List<GameData> lastListedGames = new ArrayList<>();
 
     public PostLoginClient(ServerFacade server, ChessClient mainClient, String authToken) {
         this.server = server;
@@ -51,34 +56,54 @@ public class PostLoginClient implements UIClient {
         throw new ResponseException(400, "Expected: creategame <game name>");
     }
 
-    private String listGames() throws Exception {
-        Collection<GameData> games = server.listGames(authToken);
-        if (games.isEmpty()) {
-            return "No games found.";
-        }
+    private String listGames() {
+        try {
+            var games = server.listGames(mainClient.getAuthToken());
+            lastListedGames = games;
 
-        StringBuilder sb = new StringBuilder("Games:\n");
-        int index = 1;
-        for (GameData game : games) {
-            sb.append(index++)
-                    .append(". ")
-                    .append(game.gameName())
-                    .append(" [White: ").append(game.whiteUsername() != null ? game.whiteUsername() : "—")
-                    .append(", Black: ").append(game.blackUsername() != null ? game.blackUsername() : "—")
-                    .append("]\n");
+            StringBuilder sb = new StringBuilder("Games:\n");
+            int index = 1;
+            for (var game : games) {
+                sb.append(String.format("%d. %s | White: %s | Black: %s\n",
+                        index++,
+                        game.gameName(),
+                        game.whiteUsername() == null ? "none" : game.whiteUsername(),
+                        game.blackUsername() == null ? "none" : game.blackUsername()));
+            }
+            return sb.toString();
+
+        } catch (ResponseException e) {
+            return "Error: " + e.getMessage();
         }
-        return sb.toString();
     }
+
 
     private String joinGame(String... params) throws Exception {
         if (params.length == 2) {
-            int gameNumber = Integer.parseInt(params[0]);
+            int gameIndex = Integer.parseInt(params[0]);
+
+            if (gameIndex < 1 || gameIndex > lastListedGames.size()) {
+                throw new ResponseException(400, "Invalid game number. Try running listgames first.");
+            }
+
+            String actualGameId = String.valueOf(lastListedGames.get(gameIndex - 1).gameID());
             String color = params[1];
-            server.joinGame(String.valueOf(gameNumber), color, authToken);
-            return "Joined game " + gameNumber + " as " + color;
+
+            server.joinGame(mainClient.getAuthToken(), actualGameId, color);
+            // TODO: fetch game from server or database
+            ChessGame game = new ChessGame(); // Replace with real fetch if you have it
+
+            // Print board
+            ChessGame.TeamColor teamColor = ChessGame.TeamColor.valueOf(color);
+            BoardPrinter.draw(game, teamColor);
+            return "Joined game " + gameIndex + " as " + color;
         }
-        throw new ResponseException(400, "Expected: joingame <game number> <WHITE|BLACK>");
+        throw new ResponseException(400, "Usage: joingame <game number> <WHITE|BLACK>");
     }
+
+
+
+
 
     private String observeGame(String... params) throws Exception {
         if (params.length == 1) {
