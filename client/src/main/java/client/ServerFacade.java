@@ -6,8 +6,8 @@ import dataaccess.GameResponse;
 import dataaccess.ResponseException;
 import model.UserData;
 import model.GameData;
-import model.AuthData;
 import dataaccess.UserResponse;
+
 
 import java.io.BufferedReader;
 import java.io.IOException;
