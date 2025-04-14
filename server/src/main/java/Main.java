@@ -16,14 +16,7 @@ public class Main {
             if (args.length >= 1) {
                 port = Integer.parseInt(args[0]);
             }
-
-//             DataAccess dataAccess = new MemoryDataAccess();
-           DataAccess dataAccess = new UserDataBaseAccess();
-//            if (args.length >= 2 && args[1].equalsIgnoreCase("sql")) {
-//                System.out.println("using Db");
-//                dataAccess = new UserDataBaseAccess();
-//            }
-
+            DataAccess dataAccess = new UserDataBaseAccess();
             var server = new Server();
             int portNumber = server.run(port);
             System.out.printf("Server started on port %d with %s%n", portNumber, dataAccess.getClass());

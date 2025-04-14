@@ -24,7 +24,7 @@ public class PreLoginClient implements UIClient {
             case "register" -> register(params);
             case "login" -> login(params);
             case "help" -> help();
-            case "quit" -> "Goodbye!";
+            case "quit" -> "quit";
             default -> "Unknown command. Type 'help' for options.";
         };
     }
@@ -38,7 +38,7 @@ public class PreLoginClient implements UIClient {
                 UserResponse response = server.register(username, password, email);
                 chessClient.setAuthToken(response.getAuthToken());
                 chessClient.promoteToPostLogin();
-                return String.format("Welcome, %s! You are now registered and logged in.", username);
+                return String.format("Welcome, %s! You are now registered and logged in.\n%s", username, chessClient.help());
             } catch (ResponseException e) {
                 return "Error: " + e.getMessage();
             } catch (Exception e) {
@@ -56,7 +56,7 @@ public class PreLoginClient implements UIClient {
                 UserResponse response = server.login(username, password);
                 chessClient.setAuthToken(response.getAuthToken());
                 chessClient.promoteToPostLogin();
-                return String.format("Welcome back, %s! You are now logged in.", username);
+                return String.format("Welcome back, %s! You are now logged in.\n%s", username, chessClient.help());
             } catch (ResponseException e) {
                 return "Error: " + e.getMessage();
             } catch (Exception e) {

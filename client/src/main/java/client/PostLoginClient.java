@@ -80,6 +80,10 @@ public class PostLoginClient implements UIClient {
 
     private String joinGame(String... params) throws Exception {
         if (params.length == 2) {
+            if (lastListedGames.isEmpty()) {
+                listGames();
+            }
+
             int gameIndex = Integer.parseInt(params[0]);
 
             if (gameIndex < 1 || gameIndex > lastListedGames.size()) {
@@ -87,13 +91,12 @@ public class PostLoginClient implements UIClient {
             }
 
             String actualGameId = String.valueOf(lastListedGames.get(gameIndex - 1).gameID());
-            String color = params[1];
+            String color = params[1].toUpperCase();
 
             server.joinGame(mainClient.getAuthToken(), actualGameId, color);
             // TODO: fetch game from server or database
-            ChessGame game = new ChessGame(); // Replace with real fetch if you have it
+            ChessGame game = new ChessGame();
 
-            // Print board
             ChessGame.TeamColor teamColor = ChessGame.TeamColor.valueOf(color);
             BoardPrinter.draw(game, teamColor);
             return "Joined game " + gameIndex + " as " + color;
