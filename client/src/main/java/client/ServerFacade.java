@@ -28,12 +28,7 @@ public class ServerFacade {
     }
 
     public UserResponse register(String username, String password, String email) throws Exception {
-        var url = new URL(serverUrl + "/user");
-        var connection = (HttpURLConnection) url.openConnection();
-
-        connection.setRequestMethod("POST");
-        connection.setRequestProperty("Content-Type", "application/json");
-        connection.setDoOutput(true);
+        var connection = getUrlConnection(username, password, email);
 
         var requestBody = gson.toJson(new UserData(username, password, email));
         try (var outputStream = connection.getOutputStream()) {
@@ -52,6 +47,22 @@ public class ServerFacade {
                 throw new RuntimeException("Error: " + errorMessage);
             }
         }
+    }
+
+    private HttpURLConnection getUrlConnection(String username, String password, String email) throws IOException {
+        if (username == null || username.isBlank() ||
+                password == null || password.isBlank() ||
+                email == null || email.isBlank()) {
+            throw new IllegalArgumentException("All fields (username, password, email) must be non-empty");
+        }
+
+        var url = new URL(serverUrl + "/user");
+        var connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
+        return connection;
     }
 
 
@@ -140,12 +151,15 @@ public class ServerFacade {
                 "gameID", gameId,
                 "playerColor", playerColor
         );
+
+
         var headers = Map.of("Authorization", authToken);
         makeRequest("PUT", "/game", request, headers, null);
     }
 
 
     public void observeGame(String authToken, String gameId) throws Exception {
+
         var request = Map.of(
                 "gameID", gameId,
                 "playerColor", "observer"

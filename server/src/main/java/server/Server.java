@@ -78,18 +78,37 @@ public class Server {
             String authToken = req.headers("authorization");
             JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();
 
-            String gameID = extractGameID(body, res);
-            String playerColor = extractPlayerColor(body, res);
+            if (body.get("gameID") == null || body.get("gameID").getAsString().isEmpty()) {
+                res.status(400);
+                throw new IllegalArgumentException("bad request");
+            }
+            String gameID = body.get("gameID").getAsString();
+            if (body.get("playerColor") == null || body.get("playerColor").getAsString().isEmpty()) {
+                res.status(400);
+                throw new IllegalArgumentException("bad request");
+            }
+            String playerColor = body.get("playerColor").getAsString();
+
+            if (!service.validateAuthToken(authToken)) {
+                throw new ResponseException(401, "Invalid auth token");
+            }
+
+            var games = service.listGames(authToken);
+            boolean gameExists = games.stream().anyMatch(g -> Integer.toString(g.gameID()).equals(gameID));
+            if (!gameExists) {
+                throw new ResponseException(400, "Game not found");
+            }
 
             if (playerColor.equalsIgnoreCase("observer")) {
-                if (!service.validateAuthToken(authToken)) {
-                    throw new ResponseException(401, "Invalid auth token");
-                }
                 System.out.println("Observer joined game " + gameID);
                 res.status(200);
                 return "{}";
             }
 
+            if (!playerColor.equalsIgnoreCase("white") && !playerColor.equalsIgnoreCase("black")) {
+                res.status(400);
+                throw new IllegalArgumentException("bad request, invalid player color");
+            }
 
             boolean success = service.joinGame(authToken, gameID, playerColor);
             if (success) {
@@ -97,19 +116,21 @@ public class Server {
                 return "{}";
             } else {
                 res.status(500);
-                return errorJson("unknown error");
+                return new Gson().toJson(Map.of("message", "Error: unknown error"));
             }
 
         } catch (IllegalArgumentException e) {
-            return handleIllegalArg(e, res);
+            res.status(400);
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         } catch (ResponseException e) {
             res.status(e.getStatusCode());
-            return errorJson(e.getMessage());
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         } catch (Exception e) {
             res.status(500);
-            return errorJson(e.getMessage());
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
         }
     }
+
     private String extractGameID(JsonObject body, Response res) {
         if (!body.has("gameID") || body.get("gameID").isJsonNull() || body.get("gameID").getAsString().isBlank()) {
             res.status(400);
@@ -304,4 +325,18 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
+
+
+    public boolean gameExists(String gameID) {
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement("SELECT gameID FROM GameData WHERE gameID = ?")) {
+            ps.setInt(1, Integer.parseInt(gameID));
+            try (var rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }
