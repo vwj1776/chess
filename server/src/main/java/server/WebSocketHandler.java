@@ -24,6 +24,9 @@ public class WebSocketHandler {
 
     public WebSocketHandler() throws ResponseException, DataAccessException {}
 
+
+
+
     @OnWebSocketConnect
     public void onConnect(Session session) {
         connections.put(session, new Connection(session, -1, null));
@@ -78,9 +81,24 @@ public class WebSocketHandler {
     }
 
     private void handleLeave(Session session) {
-        send(session, ServerMessage.notification("You left the game"));
+        Connection connection = connections.get(session);
+
+        if (connection == null) {
+            sendError(session, "You are not in a game");
+            return;
+        }
+
+        int gameId = connection.getGameId();
         connections.remove(session);
+
+        try {
+            String username = service.getUsernameFromAuth(connection.authToken);
+            broadcastMessageExcept(gameId, ServerMessage.notification(username + " left the game"), session);
+        } catch (Exception e) {
+            sendError(session, "Error on leave: " + e.getMessage());
+        }
     }
+
 
     private void handleResign(Session session) {
         try {
@@ -227,6 +245,18 @@ public class WebSocketHandler {
             }
         }
         return result;
+    }
+
+    public static boolean isUserStillConnected(int gameId, String username) {
+        for (var conn : connections.values()) {
+            if (conn.getGameId() == gameId) {
+                try {
+                    String connectedUsername = new ChessService().getUsernameFromAuth(conn.authToken);
+                    if (username.equals(connectedUsername)) return true;
+                } catch (Exception ignored) {}
+            }
+        }
+        return false;
     }
 
     private static class Connection {

@@ -307,6 +307,9 @@ public class UserDataBaseAccess implements DataAccess {
             throw new IllegalArgumentException("Invalid player color: " + playerColor);
         }
 
+
+
+
         try (var conn = DatabaseManager.getConnection()) {
             String column = switch (playerColor.toUpperCase()) {
                 case "WHITE" -> "whiteUsername";
@@ -328,8 +331,14 @@ public class UserDataBaseAccess implements DataAccess {
                     if (rs.next()) {
                         String currentUser = rs.getString(column);
                         if (currentUser != null && !currentUser.isEmpty()) {
-                            throw new ResponseException(403, "Color already taken");
+                            // Check if current user is still connected to this game via WebSocket
+                            boolean playerStillConnected = server.WebSocketHandler.isUserStillConnected(Integer.parseInt(gameID), currentUser);
+
+                            if (playerStillConnected) {
+                                throw new ResponseException(403, "Color already taken");
+                            }
                         }
+
                     } else {
                         throw new ResponseException(400, "Game not found");
                     }
