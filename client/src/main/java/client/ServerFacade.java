@@ -158,12 +158,13 @@ public class ServerFacade {
     }
 
 
-    public void observeGame(String authToken, String gameId) throws Exception {
+    public void observeGame(String gameId, String authToken) throws Exception {
 
         var request = Map.of(
                 "gameID", gameId,
                 "playerColor", "observer"
         );
+        System.out.println("authToken in serverfacade" + authToken);
         var headers = Map.of("Authorization", authToken);
         makeRequest("PUT", "/game", request, headers, Void.class);
     }

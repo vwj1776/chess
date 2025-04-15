@@ -40,9 +40,10 @@ public class PostLoginClient implements UIClient {
                 default -> "Unknown command. Type 'help' for available commands.";
             };
         } catch (ResponseException e) {
-            return "Error: " + e.getMessage();
+            return formatError(e.getMessage());
         } catch (Exception e) {
-            return "Error: Unexpected failure - " + e.getMessage();
+            return "Error: Unexpected failure - " + formatError(e.getMessage());
+
         }
     }
 
@@ -72,7 +73,7 @@ public class PostLoginClient implements UIClient {
             return sb.toString();
 
         } catch (ResponseException e) {
-            return "Error: " + e.getMessage();
+            return formatError(e.getMessage());
         }
     }
 
@@ -109,12 +110,29 @@ public class PostLoginClient implements UIClient {
 
     private String observeGame(String... params) throws Exception {
         if (params.length == 1) {
-            int gameNumber = Integer.parseInt(params[0]);
-            server.observeGame(String.valueOf(gameNumber), authToken);
-            return "Observing game " + gameNumber;
+            if (lastListedGames.isEmpty()) {
+                listGames(); // Populate the game list
+            }
+
+            int gameIndex = Integer.parseInt(params[0]);
+
+            if (gameIndex < 1 || gameIndex > lastListedGames.size()) {
+                throw new ResponseException(400, "Invalid game number. Try running listgames first.");
+            }
+
+            String actualGameId = String.valueOf(lastListedGames.get(gameIndex - 1).gameID());
+
+            server.observeGame(actualGameId, authToken);
+            // TODO: fetch game from server or database
+            ChessGame game = new ChessGame();
+
+            ChessGame.TeamColor teamColor = ChessGame.TeamColor.valueOf("WHITE");
+            BoardPrinter.draw(game, teamColor);
+            return "Observing game " + gameIndex;
         }
         throw new ResponseException(400, "Expected: observe <game number>");
     }
+
 
     private String logout() throws Exception {
         server.logout(authToken);
