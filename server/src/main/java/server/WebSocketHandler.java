@@ -93,6 +93,7 @@ public class WebSocketHandler {
             int gameId = connection.getGameId();
             String authToken = connection.getAuthToken();
             String username = service.getUsernameFromAuth(authToken);
+            service.resignGame(gameId);
 
             broadcastMessage(gameId, ServerMessage.notification(username + " resigned the game."));
            // send(session, ServerMessage.notification("You resigned the game."));
@@ -116,6 +117,12 @@ public class WebSocketHandler {
             }
 
             ChessGame chessGame = service.getGame(gameId);
+
+            if (service.isGameResigned(gameId)) {
+                sendError(session, "Game is already over");
+                return;
+            }
+
             GameData gameData = service.listGames(auth).stream()
                     .filter(g -> g.gameID() == gameId)
                     .findFirst()

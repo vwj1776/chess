@@ -11,12 +11,15 @@ import model.UserData;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class ChessService {
     private final DataAccess dataAccess;
 
     private final HashMap<String, UserData> users = new HashMap<>();
+    private final Set<Integer> resignedGames = new HashSet<>();
 
 
     public ChessService(DataAccess dataAccess) {
@@ -103,6 +106,14 @@ public class ChessService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public void resignGame(int gameId) {
+        resignedGames.add(gameId);
+    }
+
+    public boolean isGameResigned(int gameId) {
+        return resignedGames.contains(gameId);
     }
 
 }

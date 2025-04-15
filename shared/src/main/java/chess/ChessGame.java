@@ -14,6 +14,8 @@ public class ChessGame {
 
     private ChessBoard board = new ChessBoard();
 
+    private boolean gameOver = false;
+
     public ChessGame() {
         board.resetBoard();
     }
@@ -32,6 +34,14 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         turn = team;
+    }
+
+    public boolean getGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean isGameOver){
+        gameOver = isGameOver;
     }
 
     /**
