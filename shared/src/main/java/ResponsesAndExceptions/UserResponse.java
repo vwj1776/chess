@@ -1,4 +1,4 @@
-package dataaccess;
+package ResponsesAndExceptions;
 
 public class UserResponse {
     private String username;

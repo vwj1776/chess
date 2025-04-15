@@ -1,9 +1,9 @@
 package service;
 
 import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.ResponseException;
-import dataaccess.UserResponse;
+import ResponsesAndExceptions.DataAccessException;
+import ResponsesAndExceptions.ResponseException;
+import ResponsesAndExceptions.UserResponse;
 import model.GameData;
 import model.UserData;
 

@@ -1,4 +1,4 @@
-package dataaccess;
+package ResponsesAndExceptions;
 
 import model.GameData;
 

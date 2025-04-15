@@ -2,13 +2,13 @@ package service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import chess.ChessGame;
+import ResponsesAndExceptions.ResponseException;
+import ResponsesAndExceptions.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import dataaccess.*;
 import model.*;
 import java.util.Collection;
-import java.util.List;
 
 public class ChessServiceTest {
     MemoryDataAccess dataAccess;
