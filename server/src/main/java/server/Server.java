@@ -44,25 +44,6 @@ public class Server {
         return port;
     }
 
-//    public int run(int desiredPort) {
-//        this.port = desiredPort;
-//
-//        Spark.port(desiredPort);
-//
-//        Spark.staticFiles.location("web");
-//
-//        // Register your endpoints and handle exceptions here.
-//
-//        //This line initializes the server and can be removed once you have a functioning endpoint
-//        Spark.init();
-//
-//        runningAllEndpoints();
-//
-//
-//        Spark.awaitInitialization();
-//        return Spark.port();
-//    }
-
     private Object joinGame(Request req, Response res) {
         try {
             String authToken = req.headers("authorization");

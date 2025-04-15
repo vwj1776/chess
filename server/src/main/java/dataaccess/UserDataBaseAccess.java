@@ -365,6 +365,28 @@ public class UserDataBaseAccess implements DataAccess {
     }
 
     @Override
+    public void saveGame(Integer gameId, ChessGame chessGame) throws DataAccessException {
+        String updateSql = "UPDATE GameData SET game = ? WHERE gameID = ?";
+
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(updateSql)) {
+
+            String gameJson = new Gson().toJson(chessGame);
+            ps.setString(1, gameJson);
+            ps.setInt(2, gameId);
+
+            int rowsAffected = ps.executeUpdate();
+            if (rowsAffected == 0) {
+                throw new DataAccessException("No game found with ID: " + gameId, null);
+            }
+
+        } catch (SQLException | DataAccessException e) {
+            throw new DataAccessException("Failed to save game: " + e.getMessage(), (SQLException) e);
+        }
+    }
+
+
+    @Override
     public ChessGame getGame(Integer gameID) throws DataAccessException {
         String sql = "SELECT game FROM GameData WHERE gameID = ?";
         try (var conn = DatabaseManager.getConnection();

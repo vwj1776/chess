@@ -37,4 +37,5 @@ public interface DataAccess {
 
     String getUsernameFromAuth(String token) throws SQLException, DataAccessException;
 
+    void saveGame(Integer gameId, ChessGame chessGame) throws DataAccessException;
 }

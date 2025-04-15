@@ -91,7 +91,7 @@ public class ChessService {
 
     public void saveGame(Integer gameId, ChessGame chessGame) {
         try {
-           //  dataAccess.saveGame(gameId, chessGame);
+           dataAccess.saveGame(gameId, chessGame);
         } catch (Exception e) {
             e.printStackTrace();
         }

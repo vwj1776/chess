@@ -26,7 +26,7 @@ public class WebSocketHandler {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        connections.put(session, new Connection(session, -1));
+        connections.put(session, new Connection(session, -1, null));
     }
 
     @OnWebSocketClose
@@ -66,7 +66,7 @@ public class WebSocketHandler {
             }
 
             ChessGame game = service.getGame(command.getGameID());
-            connections.put(session, new Connection(session, command.getGameID()));
+            connections.put(session, new Connection(session, command.getGameID(), command.getAuthToken()));
             send(session, ServerMessage.loadGame(game));
 
             String username = service.getUsernameFromAuth(command.getAuthToken());
@@ -83,8 +83,26 @@ public class WebSocketHandler {
     }
 
     private void handleResign(Session session) {
-        send(session, ServerMessage.notification("You resigned the game"));
+        try {
+            Connection connection = connections.get(session);
+            if (connection == null) {
+                sendError(session, "Not connected to any game");
+                return;
+            }
+
+            int gameId = connection.getGameId();
+            String authToken = connection.getAuthToken();
+            String username = service.getUsernameFromAuth(authToken);
+
+            broadcastMessage(gameId, ServerMessage.notification(username + " resigned the game."));
+            send(session, ServerMessage.notification("You resigned the game."));
+
+        } catch (Exception e) {
+            sendError(session, "Failed to resign: " + e.getMessage());
+        }
     }
+
+
 
     private void handleMove(Session session, UserGameCommand command) {
         try {
@@ -98,7 +116,10 @@ public class WebSocketHandler {
             }
 
             ChessGame chessGame = service.getGame(gameId);
-            GameData gameData = null;
+            GameData gameData = service.listGames(auth).stream()
+                    .filter(g -> g.gameID() == gameId)
+                    .findFirst()
+                    .orElseThrow(() -> new ResponseException(400, "Game not found"));
             ChessGame.TeamColor color = service.getPlayerColor(auth, gameData);
 
             if (chessGame.getTeamTurn() != color) {
@@ -184,14 +205,21 @@ public class WebSocketHandler {
     private static class Connection {
         final Session session;
         final int gameId;
+        final String authToken;
 
-        public Connection(Session session, int gameId) {
+        public Connection(Session session, int gameId, String authToken) {
             this.session = session;
             this.gameId = gameId;
+            this.authToken = authToken;
         }
 
         public int getGameId() {
             return gameId;
         }
+
+        public String getAuthToken() {
+            return authToken;
+        }
     }
+
 }

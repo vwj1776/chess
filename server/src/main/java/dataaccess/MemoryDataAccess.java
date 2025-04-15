@@ -223,5 +223,10 @@ public class MemoryDataAccess implements DataAccess {
         return null;
     }
 
+    @Override
+    public void saveGame(Integer gameId, ChessGame chessGame) {
+
+    }
+
 
 }
