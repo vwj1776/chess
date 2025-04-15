@@ -61,7 +61,7 @@ public class PreLoginClient implements UIClient {
                 chessClient.promoteToPostLogin();
                 return String.format("Welcome back, %s! You are now logged in.\n%s", username, chessClient.help());
             } catch (ResponseException e) {
-                return "Error: " + e.getMessage();
+                return formatError(e.getMessage());
             } catch (Exception e) {
                 return "Unexpected error: " + e.getMessage(); // make the error pretty for the human, make it red and stuff UI
             }
