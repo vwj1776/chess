@@ -163,6 +163,7 @@ public class UserDataBaseAccess implements DataAccess {
             throw new ResponseException(401, "Invalid login");
         }
 
+
         try {
             String token = addAuthToken(user);
             return new UserResponse(username, token);
