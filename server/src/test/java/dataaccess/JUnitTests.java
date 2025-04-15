@@ -22,13 +22,13 @@ public class JUnitTests {
     }
 
     @Test
-    void addUser_positive() {
+    void addUserPositive() {
         UserData user = new UserData("alice", "password123", "alice@mail.com");
         assertDoesNotThrow(() -> dao.addUser(user));
     }
 
     @Test
-    void addUser_negative_duplicateUsername() throws Exception {
+    void addUserNegativeDuplicateUsername() throws Exception {
         UserData user1 = new UserData("bob", "pass", "bob@mail.com");
         dao.addUser(user1);
         UserData user2 = new UserData("bob", "diffpass", "bob2@mail.com");
@@ -36,7 +36,7 @@ public class JUnitTests {
     }
 
     @Test
-    void getUser_positive() throws Exception {
+    void getUserPositive() throws Exception {
         UserData user = new UserData("carol", "secret", "carol@mail.com");
         dao.addUser(user);
         UserData result = dao.getUser("carol");
@@ -45,13 +45,13 @@ public class JUnitTests {
     }
 
     @Test
-    void getUser_negative_notFound() throws Exception {
+    void getUserNegativeNotFound() throws Exception {
         UserData result = dao.getUser("nonexistent");
         assertNull(result);
     }
 
     @Test
-    void createGame_positive() throws Exception {
+    void createGamePositive() throws Exception {
         UserData user = new UserData("dave", "123", "dave@mail.com");
         dao.addUser(user);
         String token = dao.addAuthToken(user);
@@ -60,12 +60,12 @@ public class JUnitTests {
     }
 
     @Test
-    void createGame_negative_invalidToken() {
+    void createGameNegativeInvalidToken() {
         assertThrows(ResponseException.class, () -> dao.createGame("Bad Game", "fake-token"));
     }
 
     @Test
-    void joinGame_positive() throws Exception {
+    void joinGamePositive() throws Exception {
         UserData user = new UserData("ellen", "pw", "ellen@mail.com");
         dao.addUser(user);
         String token = dao.addAuthToken(user);
@@ -75,7 +75,7 @@ public class JUnitTests {
     }
 
     @Test
-    void joinGame_negative_invalidColor() throws Exception {
+    void joinGameNegativeInvalidColor() throws Exception {
         UserData user = new UserData("frank", "pw", "frank@mail.com");
         dao.addUser(user);
         String token = dao.addAuthToken(user);
@@ -84,7 +84,7 @@ public class JUnitTests {
     }
 
     @Test
-    void validateAuthToken_positive() throws Exception {
+    void validateAuthTokenPositive() throws Exception {
         UserData user = new UserData("gina", "pw", "gina@mail.com");
         dao.addUser(user);
         String token = dao.addAuthToken(user);
@@ -92,12 +92,12 @@ public class JUnitTests {
     }
 
     @Test
-    void validateAuthToken_negative() {
+    void validateAuthTokenNegative() {
         assertFalse(dao.validateAuthToken("invalid-token"));
     }
 
     @Test
-    void listGames_positive() throws Exception {
+    void listGamesPositive() throws Exception {
         UserData user = new UserData("harry", "pw", "harry@mail.com");
         dao.addUser(user);
         String token = dao.addAuthToken(user);
@@ -108,12 +108,12 @@ public class JUnitTests {
     }
 
     @Test
-    void listGames_negative_invalidToken() {
+    void listGamesNegativeInvalidToken() {
         assertThrows(ResponseException.class, () -> dao.listGames("fake-token"));
     }
 
     @Test
-    void addAuthToken_positive() throws Exception {
+    void addAuthTokenPositive() throws Exception {
         UserData user = new UserData("authme", "pw", "authme@mail.com");
         dao.addUser(user);
         String token = dao.addAuthToken(user);
@@ -122,16 +122,14 @@ public class JUnitTests {
     }
 
     @Test
-    void addAuthToken_negative_userDoesNotExist() {
+    void addAuthTokenNegativeUserDoesNotExist() {
         UserData fakeUser = new UserData("ghost", "pw", "ghost@mail.com");
-
         DataAccessException exception = assertThrows(DataAccessException.class, () -> dao.addAuthToken(fakeUser));
         assertTrue(exception.getMessage().contains("User does not exist"));
     }
 
-
     @Test
-    void login_positive() throws Exception {
+    void loginPositive() throws Exception {
         UserData user = new UserData("testUser", "securePassword", "test@mail.com");
         dao.addUser(user);
 
@@ -143,7 +141,7 @@ public class JUnitTests {
     }
 
     @Test
-    void login_negative_wrongPassword() throws Exception {
+    void loginNegativeWrongPassword() throws Exception {
         UserData user = new UserData("badUser", "rightPassword", "bad@mail.com");
         dao.addUser(user);
 
@@ -151,27 +149,23 @@ public class JUnitTests {
     }
 
     @Test
-    void logout_positive() throws Exception {
+    void logoutPositive() throws Exception {
         UserData user = new UserData("logoutUser", "pw123", "logout@mail.com");
         dao.addUser(user);
         String token = dao.addAuthToken(user);
 
-        // dont  throw pls
         assertDoesNotThrow(() -> dao.logout(token));
     }
 
     @Test
-    void logout_negative_invalidToken() {
+    void logoutNegativeInvalidToken() {
         String fakeToken = "nonexistent-token";
-
         ResponseException exception = assertThrows(ResponseException.class, () -> dao.logout(fakeToken));
         assertEquals(401, exception.getStatusCode());
     }
 
-
-
     @Test
-    void clear_positive() throws Exception {
+    void clearPositive() throws Exception {
         UserData user = new UserData("ivy", "pw", "ivy@mail.com");
         dao.addUser(user);
         dao.clear();
