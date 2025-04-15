@@ -16,7 +16,6 @@ public class ChessServiceTest {
     UserData user;
     AuthData newAuthData;
 
-
     @BeforeEach
     void setUp() {
         dataAccess = new MemoryDataAccess();
@@ -26,50 +25,47 @@ public class ChessServiceTest {
     }
 
     @Test
-    void addUser_success() throws IllegalStateException {
+    void addUserSuccess() throws IllegalStateException {
         dataAccess.addUser(user);
         assertEquals(dataAccess.getUser("fred"), user);
     }
 
     @Test
-    void addUser_failure() throws IllegalStateException {
+    void addUserFailure() throws IllegalStateException {
         UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
         dataAccess.addUser(user);
         assertThrows(IllegalStateException.class, () -> dataAccess.addUser(user));
     }
 
     @Test
-    void getUser_success() throws IllegalStateException {
+    void getUserSuccess() throws IllegalStateException {
         UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
         dataAccess.addUser(user);
         assertEquals(dataAccess.getUser("fred"), user);
     }
 
     @Test
-    void getUser_failure() throws IllegalStateException {
+    void getUserFailure() throws IllegalStateException {
         UserData user = new UserData("fred", "fred@fred.com", "fred@fred.com");
         dataAccess.addUser(user);
         assertThrows(IllegalStateException.class, () -> dataAccess.getUser("fred2"));
     }
 
     @Test
-    void login_success() {
+    void loginSuccess() {
         dataAccess.addUser(user);
-
         dataAccess.login(user.username(), user.password());
-
         assertTrue(dataAccess.isLoggedInByUser(user));
     }
 
     @Test
-    void login_failure() {
+    void loginFailure() {
         dataAccess.login(user.username(), "notTheRightPassword");
-
         assertThrows(IllegalStateException.class, () -> dataAccess.getUser("fred"));
     }
 
     @Test
-    void logout_success() throws Exception {
+    void logoutSuccess() throws Exception {
         dataAccess.addUser(user);
         UserResponse response = dataAccess.login(user.username(), user.password());
         dataAccess.logout(response.getAuthToken());
@@ -77,12 +73,12 @@ public class ChessServiceTest {
     }
 
     @Test
-    void logout_failure() {
+    void logoutFailure() {
         assertThrows(Exception.class, () -> dataAccess.logout("invalidToken"));
     }
 
     @Test
-    void listGames_success() throws ResponseException {
+    void listGamesSuccess() throws ResponseException {
         dataAccess.clear();
         dataAccess.addAuthToken(authToken, newAuthData);
         dataAccess.createGame("TestGame1", authToken);
@@ -95,50 +91,49 @@ public class ChessServiceTest {
     }
 
     @Test
-    void listGames_failure() {
+    void listGamesFailure() {
         Collection<GameData> games = dataAccess.listGames("invalidToken");
         assertNull(games);
     }
 
     @Test
-    void clear_success() {
+    void clearSuccess() {
         dataAccess.addUser(user);
         dataAccess.clear();
         assertThrows(IllegalStateException.class, () -> dataAccess.getUser(user.username()));
     }
 
     @Test
-    void joinGame_success() throws ResponseException {
+    void joinGameSuccess() throws ResponseException {
         dataAccess.addUser(user);
         UserResponse response = dataAccess.login(user.username(), user.password());
-        String gameID = dataAccess.createGame("Chess Match", response.getAuthToken());
-        assertTrue(dataAccess.joinGame(response.getAuthToken(), gameID, "WHITE"));
+        String gameId = dataAccess.createGame("Chess Match", response.getAuthToken());
+        assertTrue(dataAccess.joinGame(response.getAuthToken(), gameId, "WHITE"));
     }
 
     @Test
-    void joinGame_failure_invalidAuth() {
+    void joinGameFailureInvalidAuth() {
         assertThrows(IllegalArgumentException.class, () -> dataAccess.joinGame("invalidToken", "1", "WHITE"));
     }
 
     @Test
-    void joinGame_failure_invalidGame() {
+    void joinGameFailureInvalidGame() {
         dataAccess.addUser(user);
         UserResponse response = dataAccess.login(user.username(), user.password());
         assertThrows(IllegalArgumentException.class, () -> dataAccess.joinGame(response.getAuthToken(), "9999", "WHITE"));
     }
 
     @Test
-    void joinGame_failure_alreadyTaken() throws ResponseException {
+    void joinGameFailureAlreadyTaken() throws ResponseException {
         dataAccess.addUser(user);
         UserResponse response1 = dataAccess.login(user.username(), user.password());
-        String gameID = dataAccess.createGame("Chess Match", response1.getAuthToken());
-        dataAccess.joinGame(response1.getAuthToken(), gameID, "WHITE");
+        String gameId = dataAccess.createGame("Chess Match", response1.getAuthToken());
+        dataAccess.joinGame(response1.getAuthToken(), gameId, "WHITE");
 
         UserData user2 = new UserData("bob", "bob@bob.com", "password");
         dataAccess.addUser(user2);
         UserResponse response2 = dataAccess.login(user2.username(), user2.password());
 
-        assertThrows(IllegalArgumentException.class, () -> dataAccess.joinGame(response2.getAuthToken(), gameID, "WHITE"));
+        assertThrows(IllegalArgumentException.class, () -> dataAccess.joinGame(response2.getAuthToken(), gameId, "WHITE"));
     }
-
 }
