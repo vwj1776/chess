@@ -4,6 +4,8 @@ import chess.*;
 
 public class BoardPrinter {
 
+
+
     public static void draw(ChessGame game, ChessGame.TeamColor perspective) {
         ChessBoard board = game.getBoard();
 
@@ -15,7 +17,11 @@ public class BoardPrinter {
         int colEnd = (perspective == ChessGame.TeamColor.WHITE) ? 9 : 0;
         int colStep = (perspective == ChessGame.TeamColor.WHITE) ? 1 : -1;
 
-        System.out.println("   a  b  c  d  e  f  g  h");
+        String header = (perspective == ChessGame.TeamColor.WHITE)
+                ? "   a  b  c  d  e  f  g  h"
+                : "   h  g  f  e  d  c  b  a";
+        System.out.println(header);
+
 
         for (int row = rowStart; row != rowEnd; row += rowStep) {
             System.out.print(row + " ");
@@ -30,8 +36,9 @@ public class BoardPrinter {
             System.out.println(" " + row);
         }
 
-        System.out.println("  a  b  c  d  e  f  g  h");
+        System.out.println(header); // Print column letters again at the bottom
     }
+
 
     private static String getSymbol(ChessPiece piece) {
         if (piece == null) return EscapeSequences.EMPTY;

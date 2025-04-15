@@ -43,9 +43,9 @@ public class PreLoginClient implements UIClient {
                 chessClient.promoteToPostLogin();
                 return String.format("Welcome, %s! You are now registered and logged in.\n%s", username, chessClient.help());
             } catch (ResponseException e) {
-                return formatError(e.getMessage());
+                return "Error: " + e.getMessage();
             } catch (Exception e) {
-                return formatError(e.getMessage()); // make the error pretty for the human, make it red and stuff UI
+                return "Unexpected error: " + e.getMessage(); // make the error pretty for the human, make it red and stuff UI
             }
         }
         return "Usage: register <username> <password> <email>";
@@ -61,9 +61,9 @@ public class PreLoginClient implements UIClient {
                 chessClient.promoteToPostLogin();
                 return String.format("Welcome back, %s! You are now logged in.\n%s", username, chessClient.help());
             } catch (ResponseException e) {
-                return formatError(e.getMessage());
+                return "Error: " + e.getMessage();
             } catch (Exception e) {
-                return formatError(e.getMessage());
+                return "Unexpected error: " + e.getMessage(); // make the error pretty for the human, make it red and stuff UI
             }
         }
         return "Usage: login <username> <password>";
