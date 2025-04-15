@@ -90,9 +90,29 @@ public class WebSocketHandler {
                 return;
             }
 
+
+
             int gameId = connection.getGameId();
+
+            if(service.isGameResigned(gameId)){
+                sendError(session, "Game already resigned");
+                return;
+            }
+            String username = service.getUsernameFromAuth(connection.authToken);
+
+            GameData gameData = service.listGames(connection.authToken).stream()
+                    .filter(g -> g.gameID() == gameId)
+                    .findFirst()
+                    .orElseThrow(() -> new ResponseException(400, "Game not found"));
+            String whiteUsername = gameData.whiteUsername();
+            String blackUsername = gameData.blackUsername();
+
+            if(!Objects.equals(username, whiteUsername) && !Objects.equals(username, blackUsername)){
+                System.out.println("in if");
+                sendError(session, "Observers cannot resign");
+                return;
+            }
             String authToken = connection.getAuthToken();
-            String username = service.getUsernameFromAuth(authToken);
             service.resignGame(gameId);
 
             broadcastMessage(gameId, ServerMessage.notification(username + " resigned the game."));
