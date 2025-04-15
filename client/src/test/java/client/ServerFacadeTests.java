@@ -27,19 +27,18 @@ public class ServerFacadeTests {
     }
 
     @BeforeEach
-    void clear() throws ResponseException, IOException {
+    void clearData() throws ResponseException, IOException {
         facade.clear();
     }
 
-
     @Test
-    void register() throws Exception {
+    void registerShouldSucceed() throws Exception {
         var authData = facade.register("player1", "password", "p1@email.com");
         assertTrue(authData.getAuthToken().length() > 10);
     }
 
     @Test
-    void register_duplicateUsername_shouldFail() {
+    void registerDuplicateUsernameShouldFail() {
         assertThrows(Exception.class, () -> {
             facade.register("player1", "password", "p1@email.com");
             facade.register("player1", "wrong", "p1@email.com");
@@ -47,7 +46,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void login_positive() throws Exception {
+    void loginPositive() throws Exception {
         facade.clear();
         var registered = facade.register("loginUser", "password", "login@email.com");
         var loggedIn = facade.login("loginUser", "password");
@@ -57,7 +56,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void login_negative_wrongPassword() throws Exception {
+    void loginWrongPasswordShouldFail() throws Exception {
         facade.clear();
         facade.register("wrongPassUser", "correctPass", "user@email.com");
 
@@ -68,34 +67,31 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void login_negative_nonexistentUser() {
+    void loginNonexistentUserShouldFail() {
         var exception = assertThrows(ResponseException.class, () ->
                 facade.login("ghostUser", "noPass")
         );
         assertEquals(401, exception.getStatusCode());
     }
 
-
     @Test
-    void createGame_positive() throws Exception {
+    void createGameShouldSucceed() throws Exception {
         var auth = facade.register("gamer1", "password", "gamer1@email.com");
         String gameId = facade.createGame("EpicBattle", auth.getAuthToken());
         assertNotNull(gameId);
     }
 
     @Test
-    void createGame_invalidAuth() {
+    void createGameInvalidAuthShouldFail() {
         var badToken = "not-a-real-token";
-
         var exception = assertThrows(ResponseException.class, () -> {
             facade.createGame("My Game", badToken);
         });
-
         assertEquals(401, exception.getStatusCode());
     }
 
     @Test
-    void listGames_positive() throws Exception {
+    void listGamesShouldReturnOne() throws Exception {
         var auth = facade.register("player2", "pass123", "player2@email.com");
         facade.createGame("A cool chess game", auth.getAuthToken());
         var games = facade.listGames(auth.getAuthToken());
@@ -103,7 +99,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void listGamesMultiple_positive() throws Exception {
+    void listGamesShouldReturnMultiple() throws Exception {
         var auth = facade.register("player2", "pass123", "player2@email.com");
         facade.createGame("A cool chess game", auth.getAuthToken());
         facade.createGame("A cool chess game2", auth.getAuthToken());
@@ -113,12 +109,12 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void listGames_negative_invalidToken() {
+    void listGamesInvalidTokenShouldFail() {
         assertThrows(ResponseException.class, () -> facade.listGames("bad-token"));
     }
 
     @Test
-    void logout_negative_invalidToken() {
+    void logoutInvalidTokenShouldFail() {
         var exception = assertThrows(ResponseException.class, () ->
                 facade.logout("not-a-real-token")
         );
@@ -126,22 +122,21 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void logout_positive() throws Exception {
+    void logoutShouldSucceed() throws Exception {
         facade.clear();
         var auth = facade.register("logoutUser", "password", "logout@email.com");
-
         assertDoesNotThrow(() -> facade.logout(auth.getAuthToken()));
     }
 
     @Test
-    void joinGame_positive() throws Exception {
+    void joinGameShouldSucceed() throws Exception {
         var auth = facade.register("joiner1", "password", "joiner1@email.com");
         var gameID = facade.createGame("Test Join Game", auth.getAuthToken());
         assertDoesNotThrow(() -> facade.joinGame(auth.getAuthToken(), gameID, "WHITE"));
     }
 
     @Test
-    void joinGame_negative_invalidAuth() throws Exception {
+    void joinGameInvalidAuthShouldFail() throws Exception {
         var auth = facade.register("joiner2", "password", "joiner2@email.com");
         var gameID = facade.createGame("Invalid Join Attempt", auth.getAuthToken());
         var ex = assertThrows(ResponseException.class, () ->
@@ -151,14 +146,14 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void observeGame_positive() throws Exception {
+    void observeGameShouldSucceed() throws Exception {
         var auth = facade.register("observer1", "password", "observer1@email.com");
         var gameID = facade.createGame("Watch Me Game", auth.getAuthToken());
-        assertDoesNotThrow(() -> facade.observeGame(auth.getAuthToken(), gameID));
+        assertDoesNotThrow(() -> facade.observeGame(gameID, auth.getAuthToken()));
     }
 
     @Test
-    void observeGame_negative_invalidToken() throws Exception {
+    void observeGameInvalidTokenShouldFail() throws Exception {
         var auth = facade.register("observer2", "password", "observer2@email.com");
         var gameID = facade.createGame("Private Game", auth.getAuthToken());
 
@@ -167,21 +162,20 @@ public class ServerFacadeTests {
         assertEquals(401, exception.getStatusCode());
     }
 
-
     @Test
-    void register_missingFields_shouldFail() {
+    void registerMissingFieldsShouldFail() {
         assertThrows(Exception.class, () ->
                 facade.register("userOnly", "", "email@email.com"));
     }
 
     @Test
-    void register_nullEmail_shouldFail() {
+    void registerNullEmailShouldFail() {
         assertThrows(Exception.class, () ->
                 facade.register("userOnly", "password", null));
     }
 
     @Test
-    void login_emptyPassword_shouldFail() throws Exception {
+    void loginEmptyPasswordShouldFail() throws Exception {
         facade.register("emptypass", "realpass", "ep@email.com");
         var exception = assertThrows(ResponseException.class, () ->
                 facade.login("emptypass", ""));
@@ -189,28 +183,28 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void createGame_emptyName_shouldSucceed() throws Exception {
+    void createGameEmptyNameShouldSucceed() throws Exception {
         var auth = facade.register("emptyGameName", "pass", "empty@email.com");
         String gameId = facade.createGame("", auth.getAuthToken());
         assertNotNull(gameId);
     }
 
     @Test
-    void joinGame_withoutListGames_shouldStillWork() throws Exception {
+    void joinGameWithoutListShouldSucceed() throws Exception {
         var auth = facade.register("noListUser", "password", "noList@email.com");
         var gameID = facade.createGame("No List Join Game", auth.getAuthToken());
         assertDoesNotThrow(() -> facade.joinGame(auth.getAuthToken(), gameID, "WHITE"));
     }
 
     @Test
-    void joinGame_colorCaseInsensitive_shouldSucceed() throws Exception {
+    void joinGameColorCaseInsensitiveShouldSucceed() throws Exception {
         var auth = facade.register("caseUser", "pass", "case@email.com");
         var gameID = facade.createGame("Case Test Game", auth.getAuthToken());
-        assertDoesNotThrow(() -> facade.joinGame(auth.getAuthToken(), gameID, "white")); // lowercase
+        assertDoesNotThrow(() -> facade.joinGame(auth.getAuthToken(), gameID, "white"));
     }
 
     @Test
-    void logout_twice_shouldFailSecondTime() throws Exception {
+    void logoutTwiceShouldFailSecondTime() throws Exception {
         var auth = facade.register("logtwice", "password", "logtwice@email.com");
         facade.logout(auth.getAuthToken());
 
@@ -220,15 +214,15 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void observeGame_nonexistentGame_shouldFail() throws Exception {
+    void observeGameNonexistentGameShouldFail() throws Exception {
         var auth = facade.register("obsFail", "pass", "obs@email.com");
         var exception = assertThrows(ResponseException.class, () ->
-                facade.observeGame(auth.getAuthToken(), "9999"));
+                facade.observeGame("9999", auth.getAuthToken()));
         assertEquals(400, exception.getStatusCode());
     }
 
     @Test
-    void joinGame_alreadyTakenColor_shouldFail() throws Exception {
+    void joinGameColorAlreadyTakenShouldFail() throws Exception {
         var auth1 = facade.register("joinerOne", "pass", "j1@email.com");
         var auth2 = facade.register("joinerTwo", "pass", "j2@email.com");
 
@@ -239,5 +233,4 @@ public class ServerFacadeTests {
                 facade.joinGame(auth2.getAuthToken(), gameID, "WHITE"));
         assertEquals(403, exception.getStatusCode());
     }
-
 }
