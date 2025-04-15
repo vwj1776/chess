@@ -1,4 +1,4 @@
-package dataaccess;
+package ResponsesAndExceptions;
 
 public class GameResponse {
     private String gameID;

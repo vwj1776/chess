@@ -1,10 +1,12 @@
 package server;
 
+import ResponsesAndExceptions.DataAccessException;
+import ResponsesAndExceptions.ResponseException;
+import ResponsesAndExceptions.UserResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import dataaccess.*;
-import model.AuthData;
 import model.GameData;
 import model.UserData;
 import spark.*;

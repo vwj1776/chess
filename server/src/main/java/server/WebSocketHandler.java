@@ -2,8 +2,8 @@ package server;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import dataaccess.DataAccessException;
-import dataaccess.ResponseException;
+import ResponsesAndExceptions.DataAccessException;
+import ResponsesAndExceptions.ResponseException;
 import org.eclipse.jetty.websocket.api.*;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import service.ChessService;

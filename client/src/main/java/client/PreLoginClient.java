@@ -1,7 +1,7 @@
 package client;
 
-import dataaccess.ResponseException;
-import dataaccess.UserResponse;
+import ResponsesAndExceptions.ResponseException;
+import ResponsesAndExceptions.UserResponse;
 
 import java.util.Arrays;
 

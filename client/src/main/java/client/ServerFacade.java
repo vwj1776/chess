@@ -1,12 +1,12 @@
 package client;
 
 import com.google.gson.Gson;
-import dataaccess.GameListResponse;
-import dataaccess.GameResponse;
-import dataaccess.ResponseException;
+import ResponsesAndExceptions.GameListResponse;
+import ResponsesAndExceptions.GameResponse;
+import ResponsesAndExceptions.ResponseException;
 import model.UserData;
 import model.GameData;
-import dataaccess.UserResponse;
+import ResponsesAndExceptions.UserResponse;
 
 
 import java.io.BufferedReader;

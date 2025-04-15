@@ -1,5 +1,7 @@
 package dataaccess;
 
+import ResponsesAndExceptions.DataAccessException;
+import ResponsesAndExceptions.UserResponse;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;

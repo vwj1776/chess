@@ -1,13 +1,12 @@
 package client;
 
 import chess.ChessGame;
-import dataaccess.ResponseException;
+import ResponsesAndExceptions.ResponseException;
 import model.GameData;
 import ui.BoardPrinter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class PostLoginClient implements UIClient {
