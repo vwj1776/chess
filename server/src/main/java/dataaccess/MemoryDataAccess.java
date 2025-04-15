@@ -7,6 +7,8 @@ import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+
+import java.sql.SQLException;
 import java.util.Random;
 
 import java.util.*;
@@ -214,6 +216,11 @@ public class MemoryDataAccess implements DataAccess {
             throw new DataAccessException("Game not found with ID: " + gameID, null);
         }
         return game.game();
+    }
+
+    @Override
+    public String getUsernameFromAuth(String token) throws SQLException, DataAccessException {
+        return null;
     }
 
 

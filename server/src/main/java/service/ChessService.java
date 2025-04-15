@@ -4,9 +4,6 @@ import dataaccess.DataAccess;
 import ResponsesAndExceptions.DataAccessException;
 import ResponsesAndExceptions.ResponseException;
 import ResponsesAndExceptions.UserResponse;
-import ResponsesAndExceptions.DataAccessException;
-import ResponsesAndExceptions.ResponseException;
-import ResponsesAndExceptions.UserResponse;
 import chess.ChessGame;
 import dataaccess.*;
 import model.GameData;
@@ -74,6 +71,37 @@ public class ChessService {
             return dataAccess.getGame(gameID);
         } catch (DataAccessException e) {
             throw new ResponseException(500, "Unable to fetch game: " + e.getMessage());
+        }
+    }
+
+    public ChessGame.TeamColor getPlayerColor(String auth, GameData game) {
+        try {
+            String username = getUsernameFromAuth(auth);
+            if (game.whiteUsername() != null && game.whiteUsername().equals(username)) {
+                return ChessGame.TeamColor.WHITE;
+            } else if (game.blackUsername() != null && game.blackUsername().equals(username)) {
+                return ChessGame.TeamColor.BLACK;
+            } else {
+                return null; // Observer or not a player
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public void saveGame(Integer gameId, ChessGame chessGame) {
+        try {
+           //  dataAccess.saveGame(gameId, chessGame);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String getUsernameFromAuth(String auth) {
+        try {
+            return dataAccess.getUsernameFromAuth(auth);
+        } catch (Exception e) {
+            return null;
         }
     }
 

@@ -10,6 +10,7 @@ import chess.ChessGame;
 import model.GameData;
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public interface DataAccess {
@@ -33,4 +34,7 @@ public interface DataAccess {
     boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException;
 
     ChessGame getGame(Integer gameID) throws DataAccessException;
+
+    String getUsernameFromAuth(String token) throws SQLException, DataAccessException;
+
 }

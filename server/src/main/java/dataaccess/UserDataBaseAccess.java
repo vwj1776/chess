@@ -350,8 +350,8 @@ public class UserDataBaseAccess implements DataAccess {
     }
 
 
-
-    private String getUsernameFromAuth(String token) throws SQLException, DataAccessException {
+    @Override
+    public String getUsernameFromAuth(String token) throws SQLException, DataAccessException {
         var sql = "SELECT username FROM AuthData WHERE authToken = ?";
         try (var conn = DatabaseManager.getConnection();
              var ps = conn.prepareStatement(sql)) {
