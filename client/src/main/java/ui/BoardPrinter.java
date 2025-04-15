@@ -15,13 +15,13 @@ public class BoardPrinter {
         int colEnd = (perspective == ChessGame.TeamColor.WHITE) ? 9 : 0;
         int colStep = (perspective == ChessGame.TeamColor.WHITE) ? 1 : -1;
 
-        System.out.println("  a  b  c  d  e  f  g  h");
+        System.out.println("   a  b  c  d  e  f  g  h");
 
         for (int row = rowStart; row != rowEnd; row += rowStep) {
             System.out.print(row + " ");
             for (int col = colStart; col != colEnd; col += colStep) {
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
-                boolean isLightSquare = (row + col) % 2 == 0;
+                boolean isLightSquare = (row + col) % 2 != 0;
                 String bgColor = isLightSquare ? EscapeSequences.SET_BG_COLOR_LIGHT_GREY : EscapeSequences.SET_BG_COLOR_DARK_GREY;
                 String pieceSymbol = getSymbol(piece);
 

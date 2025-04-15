@@ -42,7 +42,7 @@ public class PreLoginClient implements UIClient {
             } catch (ResponseException e) {
                 return "Error: " + e.getMessage();
             } catch (Exception e) {
-                return "Unexpected error: " + e.getMessage();
+                return "Unexpected error: " + e.getMessage(); // make the error pretty for the human, make it red and stuff UI
             }
         }
         return "Usage: register <username> <password> <email>";
