@@ -51,6 +51,7 @@ public class PostLoginClient implements UIClient {
         if (params.length >= 1) {
             String gameName = String.join(" ", params);
             server.createGame(gameName, authToken);
+            listGames();
             return "Game created: " + gameName;
         }
         throw new ResponseException(400, "Expected: creategame <game name>");
@@ -81,7 +82,7 @@ public class PostLoginClient implements UIClient {
     private String joinGame(String... params) throws Exception {
         if (params.length == 2) {
             if (lastListedGames.isEmpty()) {
-                listGames();
+                lastListedGames = server.listGames(mainClient.getAuthToken());
             }
 
             int gameIndex = Integer.parseInt(params[0]);
