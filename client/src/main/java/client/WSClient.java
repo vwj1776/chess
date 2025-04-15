@@ -1,4 +1,4 @@
-package server;
+package client;
 
 import javax.websocket.*;
 import java.net.URI;
