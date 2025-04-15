@@ -95,7 +95,7 @@ public class WebSocketHandler {
             String username = service.getUsernameFromAuth(authToken);
 
             broadcastMessage(gameId, ServerMessage.notification(username + " resigned the game."));
-            send(session, ServerMessage.notification("You resigned the game."));
+           // send(session, ServerMessage.notification("You resigned the game."));
 
         } catch (Exception e) {
             sendError(session, "Failed to resign: " + e.getMessage());
