@@ -1,5 +1,7 @@
 package websocket.messages;
 
+import chess.ChessGame;
+
 import java.util.Objects;
 
 /**
@@ -40,5 +42,22 @@ public class ServerMessage {
     @Override
     public int hashCode() {
         return Objects.hash(getServerMessageType());
+    }
+
+    public static class LoadGameMessage extends ServerMessage {
+        private final ChessGame game;
+
+        public LoadGameMessage(ChessGame game) {
+            super(ServerMessageType.LOAD_GAME);
+            this.game = game;
+        }
+
+        public ChessGame getGame() {
+            return game;
+        }
+    }
+
+    public static ServerMessage loadGame(ChessGame game) {
+        return new LoadGameMessage(game);
     }
 }
