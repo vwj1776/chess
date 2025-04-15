@@ -1,6 +1,8 @@
 package dataaccess;
 
 import ResponsesAndExceptions.UserResponse;
+import ResponsesAndExceptions.DataAccessException;
+import ResponsesAndExceptions.UserResponse;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
@@ -204,4 +206,15 @@ public class MemoryDataAccess implements DataAccess {
         }
         return null;
     }
+
+    @Override
+    public ChessGame getGame(Integer gameID) throws DataAccessException {
+        GameData game = gameData.get(String.valueOf(gameID));
+        if (game == null) {
+            throw new DataAccessException("Game not found with ID: " + gameID, null);
+        }
+        return game.game();
+    }
+
+
 }

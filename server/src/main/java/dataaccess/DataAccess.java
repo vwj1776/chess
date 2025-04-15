@@ -3,6 +3,10 @@ package dataaccess;
 import ResponsesAndExceptions.DataAccessException;
 import ResponsesAndExceptions.ResponseException;
 import ResponsesAndExceptions.UserResponse;
+import ResponsesAndExceptions.DataAccessException;
+import ResponsesAndExceptions.ResponseException;
+import ResponsesAndExceptions.UserResponse;
+import chess.ChessGame;
 import model.GameData;
 import model.UserData;
 
@@ -28,4 +32,5 @@ public interface DataAccess {
 
     boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException;
 
+    ChessGame getGame(Integer gameID) throws DataAccessException;
 }

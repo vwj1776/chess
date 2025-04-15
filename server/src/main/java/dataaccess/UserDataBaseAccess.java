@@ -166,6 +166,7 @@ public class UserDataBaseAccess implements DataAccess {
             throw new ResponseException(401, "Invalid login");
         }
 
+
         try {
             String token = addAuthToken(user);
             return new UserResponse(username, token);
@@ -363,6 +364,24 @@ public class UserDataBaseAccess implements DataAccess {
         }
     }
 
+    @Override
+    public ChessGame getGame(Integer gameID) throws DataAccessException {
+        String sql = "SELECT game FROM GameData WHERE gameID = ?";
+        try (var conn = DatabaseManager.getConnection();
+             var ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, gameID);
+            try (var rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String gameJson = rs.getString("game");
+                    return new Gson().fromJson(gameJson, ChessGame.class);
+                } else {
+                    throw new DataAccessException("Game not found with ID: " + gameID, null);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to get game: " + e.getMessage(), e);
+        }
+    }
 
 
 }

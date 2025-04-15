@@ -44,36 +44,24 @@ public class Server {
         return port;
     }
 
-    public int run(int desiredPort) {
-        this.port = desiredPort;
-
-        Spark.port(desiredPort);
-
-        Spark.staticFiles.location("web");
-
-        // Register your endpoints and handle exceptions here.
-
-        //This line initializes the server and can be removed once you have a functioning endpoint
-        Spark.init();
-
-        Spark.post("/user", this::addUser);
-        Spark.get("/user/:username", this::getUser);
-
-        Spark.post("/session", this::session);
-        Spark.delete("/session", this::logout);
-
-        Spark.post("/game", this::makeGame);
-        Spark.get("/game", this::listGames);
-
-        Spark.put("/game", this::joinGame);
-        Spark.delete("/db", this::clear);
-
-
-
-
-        Spark.awaitInitialization();
-        return Spark.port();
-    }
+//    public int run(int desiredPort) {
+//        this.port = desiredPort;
+//
+//        Spark.port(desiredPort);
+//
+//        Spark.staticFiles.location("web");
+//
+//        // Register your endpoints and handle exceptions here.
+//
+//        //This line initializes the server and can be removed once you have a functioning endpoint
+//        Spark.init();
+//
+//        runningAllEndpoints();
+//
+//
+//        Spark.awaitInitialization();
+//        return Spark.port();
+//    }
 
     private Object joinGame(Request req, Response res) {
         try {
@@ -340,5 +328,38 @@ public class Server {
             return false;
         }
     }
+
+
+    public int run(int desiredPort) {
+        this.port = desiredPort;
+
+        Spark.port(desiredPort);
+
+        // ⬅️ Add this line to register the WebSocket endpoint
+        Spark.webSocket("/ws", WebSocketHandler.class);
+
+        Spark.staticFiles.location("web");
+
+        // Register routes
+        runningAllEndpoints();
+
+        Spark.init();
+        Spark.awaitInitialization();
+        return Spark.port();
+    }
+
+    private void runningAllEndpoints() {
+        Spark.post("/user", this::addUser);
+        Spark.get("/user/:username", this::getUser);
+
+        Spark.post("/session", this::session);
+        Spark.delete("/session", this::logout);
+
+        Spark.post("/game", this::makeGame);
+        Spark.get("/game", this::listGames);
+        Spark.put("/game", this::joinGame);
+        Spark.delete("/db", this::clear);
+    }
+
 
 }
