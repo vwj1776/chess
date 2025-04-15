@@ -60,4 +60,40 @@ public class ServerMessage {
     public static ServerMessage loadGame(ChessGame game) {
         return new LoadGameMessage(game);
     }
+
+    public static class NotificationMessage extends ServerMessage {
+        private final String message;
+
+        public NotificationMessage(String message) {
+            super(ServerMessageType.NOTIFICATION);
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
+    public static ServerMessage notification(String message) {
+        return new NotificationMessage(message);
+    }
+
+    public static class ErrorMessage extends ServerMessage {
+        private final String errorMessage;
+
+        public ErrorMessage(String errorMessage) {
+            super(ServerMessageType.ERROR);
+            this.errorMessage = errorMessage;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+    }
+
+    public static ServerMessage error(String errorMessage) {
+        return new ErrorMessage(errorMessage);
+    }
+
+
 }

@@ -1,9 +1,7 @@
 package service;
 
-import dataaccess.DataAccess;
-import dataaccess.DataAccessException;
-import dataaccess.ResponseException;
-import dataaccess.UserResponse;
+import chess.ChessGame;
+import dataaccess.*;
 import model.GameData;
 import model.UserData;
 
@@ -20,6 +18,11 @@ public class ChessService {
     public ChessService(DataAccess dataAccess) {
         this.dataAccess = dataAccess;
     }
+
+    public ChessService() throws ResponseException, DataAccessException {
+        this.dataAccess = new UserDataBaseAccess();
+    }
+
 
     public UserResponse addUser(UserData user) throws ResponseException, DataAccessException {
         return dataAccess.addUser(user);
@@ -58,4 +61,13 @@ public class ChessService {
         System.out.println("in service Join game" + "playerColor" + playerColor);
         return dataAccess.joinGame(authToken, gameID, playerColor);
     }
+
+    public ChessGame getGame(Integer gameID) throws ResponseException {
+        try {
+            return dataAccess.getGame(gameID);
+        } catch (DataAccessException e) {
+            throw new ResponseException(500, "Unable to fetch game: " + e.getMessage());
+        }
+    }
+
 }
