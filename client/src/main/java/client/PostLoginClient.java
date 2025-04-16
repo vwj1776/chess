@@ -2,6 +2,8 @@ package client;
 
 import chess.ChessGame;
 import ResponsesAndExceptions.ResponseException;
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.GameData;
 import ui.BoardPrinter;
 
@@ -15,6 +17,11 @@ public class PostLoginClient implements UIClient {
     private final ChessClient mainClient;
     private final String authToken;
     private List<GameData> lastListedGames = new ArrayList<>();
+
+    private Integer currentGameId = null;
+    private ChessGame.TeamColor currentColor = null;
+    private ChessGame currentGame = null;
+
 
     public PostLoginClient(ServerFacade server, ChessClient mainClient, String authToken) {
         this.server = server;
@@ -95,15 +102,18 @@ public class PostLoginClient implements UIClient {
             String color = params[1].toUpperCase();
 
             server.joinGame(mainClient.getAuthToken(), actualGameId, color);
-            // TODO: fetch game from server or database
-            ChessGame game = new ChessGame();
 
-            ChessGame.TeamColor teamColor = ChessGame.TeamColor.valueOf(color);
-            BoardPrinter.draw(game, teamColor);
+            // ✅ Save state for later
+            this.currentGameId = Integer.parseInt(actualGameId);
+            this.currentColor = ChessGame.TeamColor.valueOf(color);
+            this.currentGame = server.getGame(actualGameId, authToken);
+
+            BoardPrinter.draw(currentGame, currentColor);
             return "Joined game " + gameIndex + " as " + color;
         }
         throw new ResponseException(400, "Usage: joingame <game number> <WHITE|BLACK>");
     }
+
 
 
 
@@ -140,6 +150,7 @@ public class PostLoginClient implements UIClient {
         mainClient.logout();
         return "Logged out successfully.";
     }
+
 
     @Override
     public String help() {

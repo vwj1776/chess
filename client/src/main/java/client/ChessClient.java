@@ -35,4 +35,7 @@ public class ChessClient {
         this.authToken = null;
         this.currentClient = new PreLoginClient(server, this);
     }
+
+    public void setClient(PostLoginClient postLoginClient) {
+    }
 }

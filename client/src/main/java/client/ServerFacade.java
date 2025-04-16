@@ -1,5 +1,7 @@
 package client;
 
+import chess.ChessGame;
+import chess.ChessMove;
 import com.google.gson.Gson;
 import ResponsesAndExceptions.GameListResponse;
 import ResponsesAndExceptions.GameResponse;
@@ -114,7 +116,11 @@ public class ServerFacade {
         }
     }
 
+    public void makeMove(String authToken, Integer currentGameId, ChessMove move) {
+    }
 
+    public void resignGame(String authToken, int gameId) {
+    }
 
 
     private static class ErrorResponse {
@@ -197,6 +203,13 @@ public class ServerFacade {
             return response.toString();
         }
     }
+
+    public ChessGame getGame(String gameId, String authToken) throws ResponseException {
+        var url = "/game/" + gameId;
+        var headers = Map.of("Authorization", authToken);
+        return makeRequest("GET", url, null, headers, ChessGame.class);
+    }
+
 
 
 }

@@ -2,6 +2,8 @@ package ui;
 
 import chess.*;
 
+import java.util.Collection;
+
 public class BoardPrinter {
 
 
@@ -61,5 +63,8 @@ public class BoardPrinter {
                 case PAWN -> EscapeSequences.BLACK_PAWN;
             };
         };
+    }
+
+    public static void highlight(ChessGame currentGame, ChessGame.TeamColor teamColor, ChessPosition position, Collection<ChessMove> legalMoves) {
     }
 }

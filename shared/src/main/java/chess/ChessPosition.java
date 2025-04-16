@@ -59,4 +59,11 @@ public class ChessPosition {
                 "," + col +
                 '}';
     }
+
+    public static ChessPosition fromCharToPosition(String notation) {
+        int col = notation.charAt(0) - 'a' + 1;
+        int row = Character.getNumericValue(notation.charAt(1));
+        return new ChessPosition(row, col);
+    }
+
 }
