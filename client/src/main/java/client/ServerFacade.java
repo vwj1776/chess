@@ -3,12 +3,12 @@ package client;
 import chess.ChessGame;
 import chess.ChessMove;
 import com.google.gson.Gson;
-import ResponsesAndExceptions.GameListResponse;
-import ResponsesAndExceptions.GameResponse;
-import ResponsesAndExceptions.ResponseException;
+import responsesandexceptions.GameListResponse;
+import responsesandexceptions.GameResponse;
+import responsesandexceptions.ResponseException;
 import model.UserData;
 import model.GameData;
-import ResponsesAndExceptions.UserResponse;
+import responsesandexceptions.UserResponse;
 
 
 import java.io.BufferedReader;

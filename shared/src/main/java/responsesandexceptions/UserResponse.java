@@ -1,4 +1,4 @@
-package ResponsesAndExceptions;
+package responsesandexceptions;
 
 public class UserResponse {
     private String username;

@@ -2,8 +2,8 @@ package service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ResponsesAndExceptions.ResponseException;
-import ResponsesAndExceptions.UserResponse;
+import responsesandexceptions.ResponseException;
+import responsesandexceptions.UserResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import dataaccess.*;

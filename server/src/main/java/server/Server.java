@@ -1,8 +1,8 @@
 package server;
 
-import ResponsesAndExceptions.DataAccessException;
-import ResponsesAndExceptions.ResponseException;
-import ResponsesAndExceptions.UserResponse;
+import responsesandexceptions.DataAccessException;
+import responsesandexceptions.ResponseException;
+import responsesandexceptions.UserResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

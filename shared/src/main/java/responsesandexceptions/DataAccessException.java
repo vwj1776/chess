@@ -1,4 +1,4 @@
-package ResponsesAndExceptions;
+package responsesandexceptions;
 
 import java.sql.SQLException;
 

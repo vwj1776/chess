@@ -1,9 +1,7 @@
 package client;
 
 import chess.ChessGame;
-import ResponsesAndExceptions.ResponseException;
-import chess.ChessMove;
-import chess.ChessPosition;
+import responsesandexceptions.ResponseException;
 import model.GameData;
 import ui.BoardPrinter;
 

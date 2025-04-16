@@ -1,12 +1,9 @@
 package client;
 
-import ResponsesAndExceptions.ResponseException;
-import ResponsesAndExceptions.UserResponse;
-import com.google.gson.Gson;
-import ui.EscapeSequences;
+import responsesandexceptions.ResponseException;
+import responsesandexceptions.UserResponse;
 
 import java.util.Arrays;
-import java.util.Map;
 
 public class PreLoginClient implements UIClient {
     private final ServerFacade server;

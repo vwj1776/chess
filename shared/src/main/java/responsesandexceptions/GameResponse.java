@@ -1,4 +1,4 @@
-package ResponsesAndExceptions;
+package responsesandexceptions;
 
 public class GameResponse {
     private String gameID;
