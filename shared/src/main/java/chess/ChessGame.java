@@ -162,8 +162,12 @@ public class ChessGame {
 
     private ChessPiece validateMoveInput(ChessMove move) throws InvalidMoveException {
         ChessPiece piece = board.getPiece(move.getStartPosition());
-        if (piece == null) throw new InvalidMoveException("No piece at the starting position");
-        if (piece.getTeamColor() != getTeamTurn()) throw new InvalidMoveException("Not your turn");
+        if (piece == null){
+            throw new InvalidMoveException("No piece at the starting position");
+        }
+        if (piece.getTeamColor() != getTeamTurn()) {
+            throw new InvalidMoveException("Not your turn");
+        }
         if (!doGetValidMoves(move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException("Invalid move");
         }
@@ -231,29 +235,40 @@ public class ChessGame {
     private boolean isUnderThreat(ChessPosition kingPosition, TeamColor opponentColor) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                ChessPiece piece = board.getBoard()[row][col];
-                if (piece != null && piece.getTeamColor() == opponentColor) {
-                    ChessPosition piecePosition = new ChessPosition(row+1, col+1);
-                    ChessPosition pawnPosition = new ChessPosition(6, 5);
-
-                    Set<ChessMove> movesOfAggressor = (Set<ChessMove>) piece.pieceMoves(board, piecePosition);  // Use the piece's move calculator
-                    if(movesOfAggressor != null){
-                        for (ChessMove move : movesOfAggressor) {
-                            if(piecePosition.equals(pawnPosition)) {
-                                print("found Pawn");
-                            }
-                            if (move.getEndPosition().equals(kingPosition)) {
-                                return true;  // The position is under threat
-                            }
-                        }
-                    }
-
+                if (isThreatFromPosition(row, col, kingPosition, opponentColor)) {
+                    return true;
                 }
             }
         }
-
-        return false;  // The position is not under threat
+        return false;
     }
+
+    private boolean isThreatFromPosition(int row, int col, ChessPosition kingPosition, TeamColor opponentColor) {
+        ChessPiece piece = board.getBoard()[row][col];
+        if (piece == null || piece.getTeamColor() != opponentColor) {
+            return false;
+        }
+
+        ChessPosition piecePosition = new ChessPosition(row + 1, col + 1);
+        ChessPosition pawnPosition = new ChessPosition(6, 5);
+
+        Set<ChessMove> moves = (Set<ChessMove>) piece.pieceMoves(board, piecePosition);
+        if (moves == null) {
+            return false;
+        }
+
+        for (ChessMove move : moves) {
+            if (piecePosition.equals(pawnPosition)) {
+                print("found Pawn");
+            }
+            if (move.getEndPosition().equals(kingPosition)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 
     /**
      * Determines if the given team is in checkmate
@@ -274,7 +289,9 @@ public class ChessGame {
     private boolean canGetOutOfCheckByDeath() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if (canEscapeCheckFrom(row, col)) return true;
+                if (canEscapeCheckFrom(row, col)) {
+                    return true;
+                }
             }
         }
         return false;
@@ -282,14 +299,18 @@ public class ChessGame {
 
     private boolean canEscapeCheckFrom(int row, int col) {
         ChessPiece piece = board.getBoard()[row][col];
-        if (piece == null || piece.getTeamColor() != getTeamTurn()) return false;
+        if (piece == null || piece.getTeamColor() != getTeamTurn()){
+            return false;
+        }
 
         ChessPosition pos = new ChessPosition(row + 1, col + 1);
         for (ChessMove move : getPotentialMoves(pos)) {
             board.makeMove(move);
             boolean stillInCheck = isInCheck(getTeamTurn());
             board.undoLastMove();
-            if (!stillInCheck) return true;
+            if (!stillInCheck) {
+                return true;
+            }
         }
         return false;
     }
@@ -315,36 +336,32 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         ChessPosition kingPosition = findKingPosition(teamColor);
-        Set<ChessMove> moves = getPotentialMoves(kingPosition);
+        Set<ChessMove> kingMoves = getPotentialMoves(kingPosition);
+        kingMoves = removeBadMovesWithoutStalemate(kingMoves);
 
-        moves = removeBadMovesWithoutStalemate(moves);
-        // Check if the king has no valid moves
-        if (moves.size() == 0) {
-            // TeamColor oppositeTeamColor = (teamColor == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+        if (!kingMoves.isEmpty()) {
+            return false; // The king has valid moves, so not stalemate
+        }
 
-            // Check if any piece (other than the king) has valid moves
-            for (int row = 0; row < 8; row++) {
-                for (int col = 0; col < 8; col++) {
-                    ChessPiece piece = board.getBoard()[row][col];
-                    if (piece != null && piece.getTeamColor() ==teamColor && piece.getPieceType() != ChessPiece.PieceType.KING) {
-                        ChessPosition piecePosition = new ChessPosition(row + 1, col + 1);
-                        Collection<ChessMove> pieceMoves = getPotentialMoves(piecePosition);
+        return !hasOtherValidMoves(teamColor); // Check if any other piece has moves
+    }
 
-                        // If any piece has valid moves, it's not stalemate
-                        if (!pieceMoves.isEmpty()) {
-                            return false;
-                        }
+    private boolean hasOtherValidMoves(TeamColor teamColor) {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = board.getBoard()[row][col];
+                if (piece != null && piece.getTeamColor() == teamColor && piece.getPieceType() != ChessPiece.PieceType.KING) {
+                    ChessPosition piecePosition = new ChessPosition(row + 1, col + 1);
+                    Collection<ChessMove> pieceMoves = getPotentialMoves(piecePosition);
+                    if (!pieceMoves.isEmpty()) {
+                        return true; // Found a non-king piece with valid moves
                     }
                 }
             }
-
-            // If no piece has valid moves (other than the king), it's stalemate
-            return true;
         }
-
-        // If the king has valid moves, it's not stalemate
-        return false;
+        return false; // No valid moves from any other piece
     }
+
 
 
 
