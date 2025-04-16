@@ -89,22 +89,6 @@ public class DatabaseTests {
         executeForAllTables(this::checkTableForPassword);
     }
 
-//    private int getDatabaseRows() {
-//        AtomicInteger rows = new AtomicInteger();
-//        executeForAllTables((tableName, connection) -> {
-//            try (var statement = connection.createStatement()) {
-//                var sql = "SELECT count(*) FROM " + tableName;
-//                try (var resultSet = statement.executeQuery(sql)) {
-//                    if (resultSet.next()) {
-//                        rows.addAndGet(resultSet.getInt(1));
-//                    }
-//                }
-//            }
-//        });
-//
-//        return rows.get();
-//    }
-
     private void checkTableForPassword(String table, Connection connection) throws SQLException {
         String sql = "SELECT * FROM " + table;
         try (Statement statement = connection.createStatement(); ResultSet rs = statement.executeQuery(sql)) {

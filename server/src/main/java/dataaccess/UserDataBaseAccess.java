@@ -107,7 +107,11 @@ public class UserDataBaseAccess implements DataAccess {
         return executeAddUser(statement, user.username(), user.password(), user.email());
     }
 
-    private UserResponse executeAddUser(String statement, String username, String password, String email) throws ResponseException, DataAccessException {
+    private UserResponse executeAddUser(String statement,
+                                        String username,
+                                        String password,
+                                        String email)
+            throws ResponseException, DataAccessException {
 
         if (getUser(username) != null) {
             throw new ResponseException(403, "Username already in database: " + username);
@@ -346,16 +350,6 @@ public class UserDataBaseAccess implements DataAccess {
                             System.out.println(gameID);
                             System.out.println(playerColor);
                             System.out.println(gameData);
-
-//                            if((gameData.blackUsername().equals(playerColor) && !playerStillConnected) || (gameData.whiteUsername().equals(playerColor) && !playerStillConnected) ){
-//                                System.out.println("in gamedata");
-//                                throw new ResponseException(403, "Color already taken");
-//                            }
-//                            if (playerStillConnected) {
-//                                System.out.println("in playerStillConnected");
-//
-//                                throw new ResponseException(403, "Color already taken");
-//                            }
 
 
                             throw new ResponseException(403, "Color already taken");

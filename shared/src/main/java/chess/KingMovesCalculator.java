@@ -37,15 +37,6 @@ public class KingMovesCalculator {
 
     private void calculateMovesGoingToCheck() {
         BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator(board, position);
-//        KnightMovesCalculator knightMovesCalculator = new KnightMovesCalculator(board, position);
-//        PawnMovesCalculator pawnMovesCalculator = new PawnMovesCalculator(board, position);
-//        QueenMovesCalculator queenMovesCalculator = new QueenMovesCalculator(board, position);
-//        RookMovesCalculator rookMovesCalculator = new RookMovesCalculator(board, position);
-//        movesGoingToCheck.addAll(bishopMovesCalculator.calculateValidMoves());
-//        movesGoingToCheck.addAll(knightMovesCalculator.calculateValidMoves());
-//        movesGoingToCheck.addAll(pawnMovesCalculator.calculateValidMoves());
-//        movesGoingToCheck.addAll(queenMovesCalculator.calculateValidMoves());
-//        movesGoingToCheck.addAll(rookMovesCalculator.calculateValidMoves());
     }
 
     private void calculateMoves() {
@@ -72,21 +63,6 @@ public class KingMovesCalculator {
 
         // Check lower left diagonal
         calculateMovesInDirection(-1, -1);
-    }
-
-    private void calculateMovesInDirection2(int rowDirection, int colDirection) {
-        ChessPiece pieceAtNextPosition = board.getPiece(new ChessPosition(rowDirection, colDirection));
-
-        if (pieceAtNextPosition == null && movesGoingToCheck.contains(new ChessPosition(rowDirection, colDirection))) {
-            // Empty cell, add the move
-            validMoves.add(new ChessMove(position, new ChessPosition(rowDirection, colDirection), null));
-        } else if(pieceAtNextPosition != null){
-            // Occupied cell, check if the piece is an opponent's piece
-            if ((pieceAtNextPosition.getTeamColor() != board.getPiece(position).getTeamColor()) && movesGoingToCheck.contains(new ChessPosition(rowDirection, colDirection))) {
-                validMoves.add(new ChessMove(position, new ChessPosition(rowDirection, colDirection), null));
-            }
-        }
-
     }
 
     private void calculateMovesInDirection(int rowDirection, int colDirection) {

@@ -84,7 +84,9 @@ public class GameplayClient implements UIClient {
         System.out.print(from);
 
         var piece = currentGame.getBoard().getPiece(from);
-        if (piece == null) return "No piece at that position.";
+        if (piece == null) {
+            return "No piece at that position.";
+        }
         ChessPosition to = new ChessPosition(endRow, endCol);
         ChessMove move = new ChessMove(from, to, null); // TODO: add promotion input if needed
 
@@ -115,7 +117,9 @@ public class GameplayClient implements UIClient {
         ChessPosition position = new ChessPosition(row, col);
         currentGame = server.getGame(String.valueOf(gameId), authToken);
         var piece = currentGame.getBoard().getPiece(position);
-        if (piece == null) return "No piece at that position.";
+        if (piece == null){
+            return "No piece at that position.";
+        }
 
         var legalMoves = piece.pieceMoves(currentGame.getBoard(), position);
         BoardPrinter.highlight(currentGame, teamColor, position, legalMoves);

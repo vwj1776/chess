@@ -70,7 +70,8 @@ public class ChessGame {
         ChessMove moveToTry = new ChessMove(startPositionForMoveToTry, endPositionForMoveToTry,null);
         ChessPiece pieceToTry = board.getPiece(startPosition);
 
-        if(isInCheck(pieceToTry.getTeamColor())) {// if the king is in threat make teh potential move, if the king is no longer under threat add the move
+
+        if(isInCheck(pieceToTry.getTeamColor())) {
             print("in check you cant move normally");
         }
 
@@ -100,9 +101,6 @@ public class ChessGame {
         if(piece != null) {
             validMoves.addAll(piece.pieceMoves(board, startPosition));
         }
-
-
-
         return validMoves;
     }
 
@@ -193,46 +191,6 @@ public class ChessGame {
 
 
         setTeamTurn(turn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
-    }
-
-    public void makeMoveWithoutChangingTurn(ChessMove move) throws InvalidMoveException {
-        ChessPosition startPosition = move.getStartPosition();
-        ChessPosition endPosition = move.getEndPosition();
-        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
-        ChessPosition startPositionForMoveToTry = new ChessPosition(7, 4);
-        ChessPosition endPositionForMoveToTry = new ChessPosition(8, 5);
-        // print(move);
-        ChessMove moveToTry = new ChessMove(startPositionForMoveToTry, endPositionForMoveToTry,null);
-        if(moveToTry.endPosition.equals(move.endPosition)) {
-            print("0------in movetoTry without changing turn");
-        }
-        ChessPiece pieceToMove = board.getPiece(startPosition);
-
-
-        Set<ChessMove> potentialMoves = doGetValidMoves(move.startPosition);
-        if (pieceToMove == null) {
-            throw new InvalidMoveException("No piece at the starting position");
-        }
-
-
-        if (!potentialMoves.contains(move)) {
-            throw new InvalidMoveException("Invalid move");
-        }
-
-        board.makeMove(move);
-        if(isInCheck(pieceToMove.getTeamColor())) {
-            board.undoLastMove();
-            potentialMoves.remove(move);
-            throw new InvalidMoveException("In Check");
-        }
-        if(isInCheckmate(pieceToMove.getTeamColor())) {
-            board.undoLastMove();
-            potentialMoves.remove(move);
-            throw new InvalidMoveException("In CheckMate");
-        }
-        if( board.getLastMove() != null) {
-            board.undoLastMove();
-        }
     }
 
 

@@ -229,14 +229,6 @@ public class WebSocketHandler {
         }
     }
 
-    private void broadcastExcept(Session sender, ServerMessage message) {
-        for (Session s : CONNECTIONS.keySet()) {
-            if (!s.equals(sender) && s.isOpen()) {
-                send(s, message);
-            }
-        }
-    }
-
     private List<Session> getSessionsForGame(int gameId) {
         List<Session> result = new ArrayList<>();
         for (Map.Entry<Session, Connection> entry : CONNECTIONS.entrySet()) {
