@@ -18,8 +18,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @WebSocket
 public class WebSocketHandler {
 
-    private static final Map<Session, Connection> connections = new ConcurrentHashMap<>();
-    private static final Gson gson = new Gson();
+    private static final Map<Session, Connection> CONNECTIONS = new ConcurrentHashMap<>();
+    private static final Gson GSON = new Gson();
     private final ChessService service = new ChessService();
 
     public WebSocketHandler() throws ResponseException, DataAccessException {}
@@ -29,12 +29,12 @@ public class WebSocketHandler {
 
     @OnWebSocketConnect
     public void onConnect(Session session) {
-        connections.put(session, new Connection(session, -1, null));
+        CONNECTIONS.put(session, new Connection(session, -1, null));
     }
 
     @OnWebSocketClose
     public void onClose(Session session, int statusCode, String reason) {
-        connections.remove(session);
+        CONNECTIONS.remove(session);
     }
 
     @OnWebSocketError
@@ -45,7 +45,7 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String messageJson) {
         try {
-            UserGameCommand command = gson.fromJson(messageJson, UserGameCommand.class);
+            UserGameCommand command = GSON.fromJson(messageJson, UserGameCommand.class);
             handleCommand(session, command);
         } catch (Exception e) {
             send(session, ServerMessage.error("Error: invalid command format"));
@@ -69,7 +69,7 @@ public class WebSocketHandler {
             }
 
             ChessGame game = service.getGame(command.getGameID());
-            connections.put(session, new Connection(session, command.getGameID(), command.getAuthToken()));
+            CONNECTIONS.put(session, new Connection(session, command.getGameID(), command.getAuthToken()));
             send(session, ServerMessage.loadGame(game));
 
             String username = service.getUsernameFromAuth(command.getAuthToken());
@@ -81,7 +81,7 @@ public class WebSocketHandler {
     }
 
     private void handleLeave(Session session) {
-        Connection connection = connections.get(session);
+        Connection connection = CONNECTIONS.get(session);
 
         if (connection == null) {
             sendError(session, "You are not in a game");
@@ -89,7 +89,7 @@ public class WebSocketHandler {
         }
 
         int gameId = connection.getGameId();
-        connections.remove(session);
+        CONNECTIONS.remove(session);
 
         try {
             String username = service.getUsernameFromAuth(connection.authToken);
@@ -102,7 +102,7 @@ public class WebSocketHandler {
 
     private void handleResign(Session session) {
         try {
-            Connection connection = connections.get(session);
+            Connection connection = CONNECTIONS.get(session);
             if (connection == null) {
                 sendError(session, "Not connected to any game");
                 return;
@@ -193,7 +193,7 @@ public class WebSocketHandler {
     }
 
     private void broadcastMessage(Integer gameId, ServerMessage message) {
-        String json = gson.toJson(message);
+        String json = GSON.toJson(message);
         for (Session s : getSessionsForGame(gameId)) {
             try {
                 s.getRemote().sendString(json);
@@ -204,7 +204,7 @@ public class WebSocketHandler {
     }
 
     private void broadcastMessageExcept(Integer gameId, ServerMessage message, Session exceptSession) {
-        String json = gson.toJson(message);
+        String json = GSON.toJson(message);
         for (Session s : getSessionsForGame(gameId)) {
             if (!s.equals(exceptSession)) {
                 try {
@@ -222,7 +222,7 @@ public class WebSocketHandler {
 
     private void send(Session session, ServerMessage message) {
         try {
-            String json = gson.toJson(message);
+            String json = GSON.toJson(message);
             session.getRemote().sendString(json);
         } catch (Exception e) {
             e.printStackTrace();
@@ -230,7 +230,7 @@ public class WebSocketHandler {
     }
 
     private void broadcastExcept(Session sender, ServerMessage message) {
-        for (Session s : connections.keySet()) {
+        for (Session s : CONNECTIONS.keySet()) {
             if (!s.equals(sender) && s.isOpen()) {
                 send(s, message);
             }
@@ -239,7 +239,7 @@ public class WebSocketHandler {
 
     private List<Session> getSessionsForGame(int gameId) {
         List<Session> result = new ArrayList<>();
-        for (Map.Entry<Session, Connection> entry : connections.entrySet()) {
+        for (Map.Entry<Session, Connection> entry : CONNECTIONS.entrySet()) {
             if (entry.getValue().getGameId() == gameId) {
                 result.add(entry.getKey());
             }
@@ -248,7 +248,7 @@ public class WebSocketHandler {
     }
 
     public static boolean isUserStillConnected(int gameId, String username) {
-        for (var conn : connections.values()) {
+        for (var conn : CONNECTIONS.values()) {
             if (conn.getGameId() == gameId) {
                 try {
                     String connectedUsername = new ChessService().getUsernameFromAuth(conn.authToken);
