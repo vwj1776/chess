@@ -304,7 +304,7 @@ public class UserDataBaseAccess implements DataAccess {
     @Override
     public boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException {
         System.out.println("join game");
-        Set<GameData> gameDataList = ChessService.allGameData;
+        Set<GameData> gameDataList = ChessService.ALL_GAME_DATA;
         GameData gameData = gameDataList.stream()
                 .filter(g -> g.gameID() == Integer.parseInt(gameID))
                 .findFirst()
