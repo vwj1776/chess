@@ -67,29 +67,42 @@ public class GameplayClient implements UIClient {
         Scanner scanner = new Scanner(System.in);
         System.out.print("Enter start row col (e.g. 2 a): ");
         int startRow = scanner.nextInt();
-        int startCol = scanner.nextInt();
+        String startColLetter = scanner.next().toLowerCase();
+
         System.out.print("Enter end row col (e.g. 4 a): ");
         int endRow = scanner.nextInt();
-        int endCol = scanner.nextInt();
-        scanner.nextLine(); // consume newline
+        String endColLetter = scanner.next().toLowerCase();
+        scanner.nextLine();
 
-
+        int startCol = letterToColumn(startColLetter);
+        int endCol = letterToColumn(endColLetter);
 
         ChessPosition from = new ChessPosition(startRow, startCol);
-        System.out.println(from);
-
         var piece = currentGame.getBoard().getPiece(from);
         if (piece == null) {
             return "No piece at that position.";
         }
+        if (piece.getTeamColor() != teamColor) {
+            return "not your piece";
+        }
+
         ChessPosition to = new ChessPosition(endRow, endCol);
-        ChessMove move = new ChessMove(from, to, null); // TODO: add promotion input if needed
+        ChessMove move = new ChessMove(from, to, null);
 
         server.makeMove(authToken, gameId, move);
         currentGame = server.getGame(String.valueOf(gameId), authToken);
         BoardPrinter.draw(currentGame, teamColor);
         return "Move made.";
     }
+
+    private int letterToColumn(String letter) throws IllegalArgumentException {
+        if (letter.length() != 1 || letter.charAt(0) < 'a' || letter.charAt(0) > 'h') {
+            throw new IllegalArgumentException("Invalid column letter: " + letter);
+        }
+        return letter.charAt(0) - 'a' + 1;
+    }
+
+
 
     private String resign() throws Exception {
         Scanner scanner = new Scanner(System.in);
