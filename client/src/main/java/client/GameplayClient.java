@@ -13,18 +13,13 @@ public class GameplayClient implements UIClient {
     private final ChessGame.TeamColor teamColor;
     private ChessGame currentGame;
 
-    public GameplayClient(ServerFacade server, ChessClient mainClient, String authToken, int gameId, ChessGame.TeamColor teamColor, ChessGame game) {
+    public GameplayClient(ServerFacade server, ChessClient mainClient, String authToken, int gameId, ChessGame.TeamColor teamColor, ChessGame game) throws Exception {
         this.server = server;
         this.mainClient = mainClient;
         this.authToken = authToken;
         this.gameId = gameId;
         this.teamColor = teamColor;
-        try {
-            this.currentGame = (game != null) ? game : server.getGame(String.valueOf(gameId), authToken);
-            //BoardPrinter.draw(this.currentGame, teamColor);
-        } catch (Exception e) {
-            System.out.println("Failed to load or draw game board: " + e.getMessage());
-        }
+        redrawBoard();
     }
 
     @Override
@@ -81,7 +76,7 @@ public class GameplayClient implements UIClient {
 
 
         ChessPosition from = new ChessPosition(startRow, startCol);
-        System.out.print(from);
+        System.out.println(from);
 
         var piece = currentGame.getBoard().getPiece(from);
         if (piece == null) {

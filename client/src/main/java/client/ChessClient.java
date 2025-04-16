@@ -33,7 +33,7 @@ public class ChessClient {
         this.currentClient = new PostLoginClient(server, this, authToken);
     }
 
-    public void promoteToGameplayClient(int gameID, ChessGame.TeamColor teamColor, ChessGame game) {
+    public void promoteToGameplayClient(int gameID, ChessGame.TeamColor teamColor, ChessGame game) throws Exception {
         this.currentClient = new GameplayClient(server, this, authToken, gameID, teamColor, game);
     }
 

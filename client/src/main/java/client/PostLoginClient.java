@@ -104,7 +104,6 @@ public class PostLoginClient implements UIClient {
             ChessGame.TeamColor teamColor = ChessGame.TeamColor.valueOf(color);
             ChessGame game = server.getGame(actualGameId, mainClient.getAuthToken());
 
-            GameplayClient gameplayClient = new GameplayClient(server, mainClient, authToken, Integer.parseInt(actualGameId), teamColor, game);
             mainClient.promoteToGameplayClient(Integer.parseInt(actualGameId), teamColor, game);
 
             return "Joined game " + gameIndex + " as " + color + ". Now entering game UI...";
