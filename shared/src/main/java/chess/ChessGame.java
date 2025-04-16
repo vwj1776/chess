@@ -155,43 +155,33 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        ChessPosition startPosition = move.getStartPosition();
-        ChessPosition endPosition = move.getEndPosition();
-        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+        ChessPiece pieceToMove = validateMoveInput(move);
+        performMoveWithCheckCheck(move, pieceToMove);
+        switchTurns();
+    }
 
-        ChessPiece pieceToMove = board.getPiece(startPosition);
-
-
-
-        Set<ChessMove> potentialMoves = doGetValidMoves(move.startPosition);
-        if (pieceToMove == null) {
-            throw new InvalidMoveException("No piece at the starting position");
-        }
-
-        if (pieceToMove.getTeamColor() != getTeamTurn()) {
-            throw new InvalidMoveException("Not your turn dumb dumb");
-        }
-
-
-
-        if (!potentialMoves.contains(move)) {
-
+    private ChessPiece validateMoveInput(ChessMove move) throws InvalidMoveException {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece == null) throw new InvalidMoveException("No piece at the starting position");
+        if (piece.getTeamColor() != getTeamTurn()) throw new InvalidMoveException("Not your turn");
+        if (!doGetValidMoves(move.getStartPosition()).contains(move)) {
             throw new InvalidMoveException("Invalid move");
         }
-
-
-        board.makeMove(move);
-        if(isInCheck(pieceToMove.getTeamColor())) {
-
-            board.undoLastMove();
-            potentialMoves.remove(move);
-            throw new InvalidMoveException("In Check");
-
-        }
-
-
-        setTeamTurn(turn == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
+        return piece;
     }
+
+    private void performMoveWithCheckCheck(ChessMove move, ChessPiece piece) throws InvalidMoveException {
+        board.makeMove(move);
+        if (isInCheck(piece.getTeamColor())) {
+            board.undoLastMove();
+            throw new InvalidMoveException("Move puts you in check");
+        }
+    }
+
+    private void switchTurns() {
+        turn = (turn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+    }
+
 
 
     /**
@@ -284,31 +274,26 @@ public class ChessGame {
     private boolean canGetOutOfCheckByDeath() {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                if(row+1 == 5 && col+1 == 4){
-                    print("in problem");
-                }
-                ChessPiece piece = board.getBoard()[row][col];
-                if (piece != null && piece.getTeamColor() == getTeamTurn()) {
-                    ChessPosition piecePosition = new ChessPosition(row + 1, col + 1);
-                    Collection<ChessMove> pieceMoves = getPotentialMoves(piecePosition);
-
-                    // If any piece has valid moves, it's not
-                    // make the baskic amove and then check for check
-                    for(ChessMove move: pieceMoves){
-                        board.makeMove(move);
-                        boolean check = isInCheck(getTeamTurn());
-                        if (!pieceMoves.isEmpty() && !check) {
-                            board.undoLastMove();
-                            return true;
-                        }
-                        board.undoLastMove();
-                    }
-
-                }
+                if (canEscapeCheckFrom(row, col)) return true;
             }
         }
         return false;
     }
+
+    private boolean canEscapeCheckFrom(int row, int col) {
+        ChessPiece piece = board.getBoard()[row][col];
+        if (piece == null || piece.getTeamColor() != getTeamTurn()) return false;
+
+        ChessPosition pos = new ChessPosition(row + 1, col + 1);
+        for (ChessMove move : getPotentialMoves(pos)) {
+            board.makeMove(move);
+            boolean stillInCheck = isInCheck(getTeamTurn());
+            board.undoLastMove();
+            if (!stillInCheck) return true;
+        }
+        return false;
+    }
+
 
 
     public Set<ChessMove> getPotentialMoves(ChessPosition position){
