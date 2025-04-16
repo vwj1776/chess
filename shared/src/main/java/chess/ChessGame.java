@@ -439,22 +439,5 @@ public class ChessGame {
 
     }
 
-    /**
-     * Creates a deep copy of the chessboard.
-     *
-     * @return A new ChessBoard instance with the same state as the current board.
-     */
-    public ChessBoard copy() {
-        ChessBoard copyBoard = new ChessBoard();
-
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                copyBoard.getBoard()[row][col] = board.getBoard()[row][col];
-            }
-        }
-
-        return copyBoard;
-    }
-
 
 }

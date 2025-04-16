@@ -73,21 +73,4 @@ public class KnightMovesCalculator {
 
     }
 
-    private void calculateMovesInDirection2(int row, int col) {
-        ChessPosition move = new ChessPosition(position.getRow() + row, position.getColumn() + col);
-
-        if (board.isValidPosition(move)) {
-            ChessPiece pieceAtCurrentPosition = board.getPiece(move);
-            if (pieceAtCurrentPosition == null) {
-                // Empty cell, add the move
-                validMoves.add(new ChessMove(position, move, null));
-            } else {
-                // Occupied cell, check if the piece is an opponent's piece
-                if (pieceAtCurrentPosition.getTeamColor() != board.getPiece(position).getTeamColor()) {
-                    validMoves.add(new ChessMove(position, move, null));
-                }
-            }
-        }
-    }
-
 }

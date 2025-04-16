@@ -102,52 +102,6 @@ public class Server {
         }
     }
 
-    private String extractGameID(JsonObject body, Response res) {
-        if (!body.has("gameID") || body.get("gameID").isJsonNull() || body.get("gameID").getAsString().isBlank()) {
-            res.status(400);
-            throw new IllegalArgumentException("bad request");
-        }
-        return body.get("gameID").getAsString();
-    }
-
-    private String extractPlayerColor(JsonObject body, Response res) {
-        if (!body.has("playerColor") || body.get("playerColor").isJsonNull() || body.get("playerColor").getAsString().isBlank()) {
-            res.status(400);
-            throw new IllegalArgumentException("bad request");
-        }
-
-        String color = body.get("playerColor").getAsString();
-        if (!color.equalsIgnoreCase("white") && !color.equalsIgnoreCase("black") && !color.equalsIgnoreCase("observer")) {
-            res.status(400);
-            throw new IllegalArgumentException("bad request, invalid player color");
-        }
-
-        return color;
-    }
-
-    private boolean isObserver(String color) {
-        return color.equalsIgnoreCase("observer");
-    }
-
-    private void handleObserverJoin(String gameID) {
-        System.out.println("Observer joined game " + gameID);
-    }
-
-    private Object handleIllegalArg(IllegalArgumentException e, Response res) {
-        String message = e.getMessage();
-        switch (message) {
-            case "unauthorized" -> res.status(401);
-            case "bad request", "bad request, invalid player color" -> res.status(400);
-            case "already taken" -> res.status(403);
-            default -> res.status(500);
-        }
-        return errorJson(message);
-    }
-
-    private String errorJson(String message) {
-        return new Gson().toJson(Map.of("message", "Error: " + message));
-    }
-
 
 
     private Object clear(Request req, Response res) {
@@ -296,20 +250,6 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
-
-
-    public boolean gameExists(String gameID) {
-        try (var conn = DatabaseManager.getConnection();
-             var ps = conn.prepareStatement("SELECT gameID FROM GameData WHERE gameID = ?")) {
-            ps.setInt(1, Integer.parseInt(gameID));
-            try (var rs = ps.executeQuery()) {
-                return rs.next();
-            }
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
 
     public int run(int desiredPort) {
         this.port = desiredPort;

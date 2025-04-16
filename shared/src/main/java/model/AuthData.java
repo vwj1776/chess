@@ -6,9 +6,4 @@ public record AuthData(String authToken, String username) {
         return UUID.randomUUID().toString();
     }
 
-    public static AuthData createWithGeneratedToken(String username) {
-        String generatedToken = UUID.randomUUID().toString();
-        return new AuthData(generatedToken, username);
-    }
-
 }
