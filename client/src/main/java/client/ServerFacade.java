@@ -219,6 +219,8 @@ public class ServerFacade {
 
 
     public ChessGame getGame(String gameID, String authToken) throws ResponseException {
+        System.out.println("in getGame ServerFacade");
+
         List<GameData> games = listGames(authToken);
         for (GameData game : games) {
             if (String.valueOf(game.gameID()).equals(gameID)) {

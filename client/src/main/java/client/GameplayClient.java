@@ -117,20 +117,31 @@ public class GameplayClient implements UIClient {
 
     private String highlightLegalMoves() throws Exception {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter row and column of piece (e.g. h 1): ");
+        System.out.print("Enter row and column of piece (e.g. 2 a): ");
         int row = scanner.nextInt();
-        int col = scanner.nextInt();
+        String colLetter = scanner.next().toLowerCase();
         scanner.nextLine();
+
+        int col = letterToColumn(colLetter);
 
         ChessPosition position = new ChessPosition(row, col);
         currentGame = server.getGame(String.valueOf(gameId), authToken);
+        if (currentGame == null){
+            return "No game found";
+        }
+
         var piece = currentGame.getBoard().getPiece(position);
         if (piece == null){
             return "No piece at that position.";
         }
 
         var legalMoves = piece.pieceMoves(currentGame.getBoard(), position);
+        if (legalMoves == null || legalMoves.isEmpty()) {
+            return "No legal moves for this piece.";
+        }
+
         BoardPrinter.highlight(currentGame, teamColor, position, legalMoves);
         return "Highlighted legal moves.";
     }
+
 }

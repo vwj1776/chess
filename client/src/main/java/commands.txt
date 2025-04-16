@@ -1,0 +1,12 @@
+login theo theo
+creategame test
+listgames
+joingame 16 white
+makemove
+2 a
+4 a
+highlight
+4 a
+leave
+logout
+quit
