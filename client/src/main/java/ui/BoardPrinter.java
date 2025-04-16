@@ -66,5 +66,6 @@ public class BoardPrinter {
     }
 
     public static void highlight(ChessGame currentGame, ChessGame.TeamColor teamColor, ChessPosition position, Collection<ChessMove> legalMoves) {
+        
     }
 }
