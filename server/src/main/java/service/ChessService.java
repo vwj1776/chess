@@ -20,6 +20,7 @@ public class ChessService {
 
     private final HashMap<String, UserData> users = new HashMap<>();
     private final Set<Integer> resignedGames = new HashSet<>();
+    public static final Set<GameData> allGameData = new HashSet<>();
 
 
     public ChessService(DataAccess dataAccess) {
@@ -57,6 +58,7 @@ public class ChessService {
     }
 
     public Collection<GameData> listGames(String authToken) throws ResponseException{
+        allGameData.addAll(dataAccess.listGames(authToken));
         return dataAccess.listGames(authToken);
     }
 

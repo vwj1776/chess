@@ -9,10 +9,13 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
+import service.ChessService;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
@@ -302,7 +305,11 @@ public class UserDataBaseAccess implements DataAccess {
     @Override
     public boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException {
         System.out.println("join game");
-
+        Set<GameData> gameDataList = ChessService.allGameData;
+        GameData gameData = gameDataList.stream()
+                .filter(g -> g.gameID() == Integer.parseInt(gameID))
+                .findFirst()
+                .orElse(null); // or throw exception if not found
         if (!playerColor.equalsIgnoreCase("WHITE") && !playerColor.equalsIgnoreCase("BLACK")) {
             throw new IllegalArgumentException("Invalid player color: " + playerColor);
         }
@@ -330,13 +337,30 @@ public class UserDataBaseAccess implements DataAccess {
                 try (var rs = checkStmt.executeQuery()) {
                     if (rs.next()) {
                         String currentUser = rs.getString(column);
-                        if (currentUser != null && !currentUser.isEmpty()) {
-                            // Check if current user is still connected to this game via WebSocket
-                            boolean playerStillConnected = server.WebSocketHandler.isUserStillConnected(Integer.parseInt(gameID), currentUser);
 
+                        if (currentUser != null && !currentUser.isEmpty()) {
+                            boolean playerStillConnected = server.WebSocketHandler.isUserStillConnected(Integer.parseInt(gameID), currentUser);
+                           ChessGame game = getGame(Integer.valueOf(gameID));
+                           ChessGame.TeamColor color = game.getTeamTurn();
+                            System.out.println(gameDataList);
+
+                            System.out.println(gameID);
+                            System.out.println(playerColor);
+                            System.out.println(gameData);
+
+//                            if((gameData.blackUsername().equals(playerColor) && !playerStillConnected) || (gameData.whiteUsername().equals(playerColor) && !playerStillConnected) ){
+//                                System.out.println("in gamedata");
+//                                throw new ResponseException(403, "Color already taken");
+//                            }
                             if (playerStillConnected) {
+                                System.out.println("in playerStillConnected");
+
                                 throw new ResponseException(403, "Color already taken");
                             }
+
+
+                            // throw new ResponseException(403, "Color already taken");
+
                         }
 
                     } else {
@@ -346,6 +370,9 @@ public class UserDataBaseAccess implements DataAccess {
             }
 
             String updateStmt = "UPDATE GameData SET " + column + " = ? WHERE gameID = ?";
+            System.out.println(gameID + "outside");
+            System.out.println(playerColor+ "outside");
+            System.out.println(gameData+ "outside");
             try (var ps = conn.prepareStatement(updateStmt)) {
                 ps.setString(1, username);
                 ps.setInt(2, Integer.parseInt(gameID));
@@ -353,9 +380,14 @@ public class UserDataBaseAccess implements DataAccess {
                 return updated > 0;
             }
 
+
+
         } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, "Unable to join game: " + e.getMessage());
+        } catch (ResponseException e) {
+            throw e;
         }
+
     }
 
 

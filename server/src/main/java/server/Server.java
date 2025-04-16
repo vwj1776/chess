@@ -44,7 +44,7 @@ public class Server {
         return port;
     }
 
-    private Object joinGame(Request req, Response res) {
+    private Object joinGame(Request req, Response res) throws ResponseException {
         try {
             String authToken = req.headers("authorization");
             JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();

@@ -73,7 +73,7 @@ public class WebSocketHandler {
             send(session, ServerMessage.loadGame(game));
 
             String username = service.getUsernameFromAuth(command.getAuthToken());
-            broadcastExcept(session, ServerMessage.notification(username + " connected to game."));
+            broadcastMessageExcept(command.getGameID(), ServerMessage.notification(username + " connected to game."), session);
 
         } catch (Exception e) {
             send(session, ServerMessage.error("Error: " + e.getMessage()));
