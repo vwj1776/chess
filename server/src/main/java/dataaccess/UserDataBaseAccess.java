@@ -11,6 +11,7 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 import service.ChessService;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -100,9 +101,6 @@ public class UserDataBaseAccess implements DataAccess {
         if (user == null || user.username() == null || user.password() == null || user.email() == null) {
             throw new ResponseException(400, "Missing fields");
         }
-//        if(getUser(user.username())){
-//
-//        }
         var statement = "INSERT INTO UserData (username, password, email) VALUES (?, ?, ?)";
         return executeAddUser(statement, user.username(), user.password(), user.email());
     }
@@ -308,80 +306,80 @@ public class UserDataBaseAccess implements DataAccess {
     @Override
     public boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException {
         System.out.println("join game");
+
         Set<GameData> gameDataList = ChessService.ALL_GAME_DATA;
         GameData gameData = gameDataList.stream()
                 .filter(g -> g.gameID() == Integer.parseInt(gameID))
                 .findFirst()
-                .orElse(null); // or throw exception if not found
+                .orElse(null);
+
         if (!playerColor.equalsIgnoreCase("WHITE") && !playerColor.equalsIgnoreCase("BLACK")) {
             throw new IllegalArgumentException("Invalid player color: " + playerColor);
         }
 
-
-
-
-        try (var conn = DatabaseManager.getConnection()) {
+        try (Connection conn = DatabaseManager.getConnection()) {
             String column = switch (playerColor.toUpperCase()) {
                 case "WHITE" -> "whiteUsername";
                 case "BLACK" -> "blackUsername";
                 default -> throw new IllegalArgumentException("Invalid player color: " + playerColor);
             };
 
-            String username;
-            try {
-                username = getUsernameFromAuth(authToken);
-            } catch (DataAccessException e) {
-                throw new ResponseException(401, "Invalid auth token");
+            String username = getUsernameOrThrow(authToken);
+
+            if (isColorAlreadyTaken(conn, gameID, column)) {
+                throw new ResponseException(403, "Color already taken");
             }
 
-            String checkQuery = "SELECT " + column + " FROM GameData WHERE gameID = ?";
-            try (var checkStmt = conn.prepareStatement(checkQuery)) {
-                checkStmt.setInt(1, Integer.parseInt(gameID));
-                try (var rs = checkStmt.executeQuery()) {
-                    if (rs.next()) {
-                        String currentUser = rs.getString(column);
+            System.out.println(gameID + " outside");
+            System.out.println(playerColor + " outside");
+            System.out.println(gameData + " outside");
 
-                        if (currentUser != null && !currentUser.isEmpty()) {
-                            boolean playerStillConnected = server.WebSocketHandler.isUserStillConnected(Integer.parseInt(gameID), currentUser);
-                           ChessGame game = getGame(Integer.valueOf(gameID));
-                           ChessGame.TeamColor color = game.getTeamTurn();
-                            System.out.println(gameDataList);
-
-                            System.out.println(gameID);
-                            System.out.println(playerColor);
-                            System.out.println(gameData);
-
-
-                            throw new ResponseException(403, "Color already taken");
-
-                        }
-
-                    } else {
-                        throw new ResponseException(400, "Game not found");
-                    }
-                }
-            }
-
-            String updateStmt = "UPDATE GameData SET " + column + " = ? WHERE gameID = ?";
-            System.out.println(gameID + "outside");
-            System.out.println(playerColor+ "outside");
-            System.out.println(gameData+ "outside");
-            try (var ps = conn.prepareStatement(updateStmt)) {
-                ps.setString(1, username);
-                ps.setInt(2, Integer.parseInt(gameID));
-                int updated = ps.executeUpdate();
-                return updated > 0;
-            }
-
-
-
+            return updatePlayerColor(conn, column, username, gameID);
         } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, "Unable to join game: " + e.getMessage());
-        } catch (ResponseException e) {
-            throw e;
         }
-
     }
+
+    private String getUsernameOrThrow(String authToken) throws ResponseException {
+        try {
+            return getUsernameFromAuth(authToken);
+        } catch (DataAccessException e) {
+            throw new ResponseException(401, "Invalid auth token");
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private boolean isColorAlreadyTaken(Connection conn, String gameID, String column) throws SQLException, ResponseException {
+        String checkQuery = "SELECT " + column + " FROM GameData WHERE gameID = ?";
+        try (var checkStmt = conn.prepareStatement(checkQuery)) {
+            checkStmt.setInt(1, Integer.parseInt(gameID));
+            try (var rs = checkStmt.executeQuery()) {
+                if (!rs.next()) {
+                    throw new ResponseException(400, "Game not found");
+                }
+
+                String currentUser = rs.getString(column);
+                if (currentUser == null || currentUser.isEmpty()) {
+                    return false;
+                }
+
+                boolean playerStillConnected = server.WebSocketHandler.isUserStillConnected(Integer.parseInt(gameID), currentUser);
+                return true; // Always throw if color is already taken, whether connected or not
+            }
+        }
+    }
+
+    private boolean updatePlayerColor(Connection conn, String column, String username, String gameID) throws SQLException {
+        String updateStmt = "UPDATE GameData SET " + column + " = ? WHERE gameID = ?";
+        try (var ps = conn.prepareStatement(updateStmt)) {
+            ps.setString(1, username);
+            ps.setInt(2, Integer.parseInt(gameID));
+            return ps.executeUpdate() > 0;
+        }
+    }
+
+
 
 
     @Override
