@@ -244,7 +244,9 @@ public class WebSocketHandler {
             if (conn.getGameId() == gameId) {
                 try {
                     String connectedUsername = new ChessService().getUsernameFromAuth(conn.authToken);
-                    if (username.equals(connectedUsername)) return true;
+                    if (username.equals(connectedUsername)) {
+                        return true;
+                    }
                 } catch (Exception ignored) {}
             }
         }

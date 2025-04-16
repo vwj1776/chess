@@ -76,7 +76,12 @@ public class ServerFacade {
 
 
     @SuppressWarnings("unchecked")
-    protected <T> T makeRequest(String method, String path, Object request, Map<String, String> headers, Class<T> responseClass) throws ResponseException {
+    protected <T> T makeRequest(String method,
+                                String path,
+                                Object request,
+                                Map<String, String> headers,
+                                Class<T> responseClass)
+            throws ResponseException {
         try {
             URL url = new URL(serverUrl + path);
             HttpURLConnection http = (HttpURLConnection) url.openConnection();

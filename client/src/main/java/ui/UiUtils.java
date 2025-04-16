@@ -3,8 +3,9 @@ package ui;
 
 public class UiUtils {
     public static String humanReadable(String msg) {
-        if (msg == null) return EscapeSequences.RED + "Unknown error occurred." + EscapeSequences.RESET;
-
+        if (msg == null){
+            return EscapeSequences.RED + "Unknown error occurred." + EscapeSequences.RESET;
+        }
         if (msg.contains("Username already")) {
             return EscapeSequences.RED + "That username is taken. Try a different one." + EscapeSequences.RESET;
         }

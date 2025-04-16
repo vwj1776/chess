@@ -391,7 +391,9 @@ public class UserDataBaseAccess implements DataAccess {
              var ps = conn.prepareStatement(sql)) {
             ps.setString(1, token);
             try (var rs = ps.executeQuery()) {
-                if (rs.next()) return rs.getString("username");
+                if (rs.next()) {
+                    return rs.getString("username");
+                }
                 SQLException e = null;
                 throw new DataAccessException("Invalid auth token", e);
             }

@@ -79,7 +79,9 @@ public class KingMovesCalculator {
                 validMoves.add(new ChessMove(position, currentPosition, null));
             } else if (pieceAtCurrentPosition != null) {
                 // Occupied cell, check if the piece is an opponent's piece
-                if (pieceAtCurrentPosition.getTeamColor() != board.getPiece(position).getTeamColor() && !movesGoingToCheck.contains(currentPosition)) {
+                if (pieceAtCurrentPosition.getTeamColor()
+                        != board.getPiece(position).getTeamColor()
+                        && !movesGoingToCheck.contains(currentPosition)) {
                     validMoves.add(new ChessMove(position, currentPosition, null));
                 }
             }
