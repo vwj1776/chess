@@ -103,16 +103,18 @@ public class PostLoginClient implements UIClient {
 
             server.joinGame(mainClient.getAuthToken(), actualGameId, color);
 
-            // ✅ Save state for later
-            this.currentGameId = Integer.parseInt(actualGameId);
-            this.currentColor = ChessGame.TeamColor.valueOf(color);
-            this.currentGame = server.getGame(actualGameId, authToken);
+            ChessGame.TeamColor teamColor = ChessGame.TeamColor.valueOf(color);
+            ChessGame game = server.getGame(actualGameId, mainClient.getAuthToken());
 
-            BoardPrinter.draw(currentGame, currentColor);
-            return "Joined game " + gameIndex + " as " + color;
+            GameplayClient gameplayClient = new GameplayClient(server, mainClient, authToken, Integer.parseInt(actualGameId), teamColor, game);
+            mainClient.promoteToGameplayClient(Integer.parseInt(actualGameId), teamColor, game);
+
+            return "Joined game " + gameIndex + " as " + color + ". Now entering game UI...";
         }
+
         throw new ResponseException(400, "Usage: joingame <game number> <WHITE|BLACK>");
     }
+
 
 
 

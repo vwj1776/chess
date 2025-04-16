@@ -1,5 +1,7 @@
 package client;
 
+import chess.ChessGame;
+
 public class ChessClient {
 
     private final ServerFacade server;
@@ -31,11 +33,13 @@ public class ChessClient {
         this.currentClient = new PostLoginClient(server, this, authToken);
     }
 
+    public void promoteToGameplayClient(int gameID, ChessGame.TeamColor teamColor, ChessGame game) {
+        this.currentClient = new GameplayClient(server, this, authToken, gameID, teamColor, game);
+    }
+
     public void logout() {
         this.authToken = null;
         this.currentClient = new PreLoginClient(server, this);
     }
 
-    public void setClient(PostLoginClient postLoginClient) {
-    }
 }

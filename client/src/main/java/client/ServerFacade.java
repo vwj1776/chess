@@ -204,11 +204,18 @@ public class ServerFacade {
         }
     }
 
-    public ChessGame getGame(String gameId, String authToken) throws ResponseException {
-        var url = "/game/" + gameId;
-        var headers = Map.of("Authorization", authToken);
-        return makeRequest("GET", url, null, headers, ChessGame.class);
+
+    public ChessGame getGame(String gameID, String authToken) throws ResponseException {
+        List<GameData> games = listGames(authToken);
+        for (GameData game : games) {
+            if (String.valueOf(game.gameID()).equals(gameID)) {
+                return game.game();
+            }
+        }
+        throw new ResponseException(404, "Game not found");
     }
+
+
 
 
 

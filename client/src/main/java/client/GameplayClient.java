@@ -1,7 +1,6 @@
 package client;
 
 import chess.*;
-import ResponsesAndExceptions.ResponseException;
 import ui.BoardPrinter;
 
 import java.util.Scanner;
@@ -14,12 +13,18 @@ public class GameplayClient implements UIClient {
     private final ChessGame.TeamColor teamColor;
     private ChessGame currentGame;
 
-    public GameplayClient(ServerFacade server, ChessClient mainClient, String authToken, int gameId, ChessGame.TeamColor teamColor) {
+    public GameplayClient(ServerFacade server, ChessClient mainClient, String authToken, int gameId, ChessGame.TeamColor teamColor, ChessGame game) {
         this.server = server;
         this.mainClient = mainClient;
         this.authToken = authToken;
         this.gameId = gameId;
         this.teamColor = teamColor;
+        try {
+            this.currentGame = (game != null) ? game : server.getGame(String.valueOf(gameId), authToken);
+            //BoardPrinter.draw(this.currentGame, teamColor);
+        } catch (Exception e) {
+            System.out.println("Failed to load or draw game board: " + e.getMessage());
+        }
     }
 
     @Override
@@ -59,21 +64,27 @@ public class GameplayClient implements UIClient {
     }
 
     private String leave() {
-        mainClient.setClient(new PostLoginClient(server, mainClient, authToken));
+        mainClient.promoteToPostLogin();
         return "You have left the game.";
     }
 
     private String makeMove() throws Exception {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter start row col (e.g. 2 2): ");
+        System.out.print("Enter start row col (e.g. 2 a): ");
         int startRow = scanner.nextInt();
         int startCol = scanner.nextInt();
-        System.out.print("Enter end row col (e.g. 3 2): ");
+        System.out.print("Enter end row col (e.g. 4 a): ");
         int endRow = scanner.nextInt();
         int endCol = scanner.nextInt();
         scanner.nextLine(); // consume newline
 
+
+
         ChessPosition from = new ChessPosition(startRow, startCol);
+        System.out.print(from);
+
+        var piece = currentGame.getBoard().getPiece(from);
+        if (piece == null) return "No piece at that position.";
         ChessPosition to = new ChessPosition(endRow, endCol);
         ChessMove move = new ChessMove(from, to, null); // TODO: add promotion input if needed
 
@@ -96,7 +107,7 @@ public class GameplayClient implements UIClient {
 
     private String highlightLegalMoves() throws Exception {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter row and column of piece (e.g. 2 1): ");
+        System.out.print("Enter row and column of piece (e.g. h 1): ");
         int row = scanner.nextInt();
         int col = scanner.nextInt();
         scanner.nextLine();
