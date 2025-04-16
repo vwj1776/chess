@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents a single chess piece
@@ -70,8 +72,11 @@ public class ChessPiece {
             return validMoves.calculateValidMoves();
         }
         if(getPieceType() == PieceType.QUEEN) {
-            QueenMovesCalculator validMoves = new QueenMovesCalculator(board, myPosition);
-            return validMoves.calculateValidMoves();
+            RookMovesCalculator rookValidMoves = new RookMovesCalculator(board, myPosition);
+            BishopMovesCalculator bishopMovesCalculator = new BishopMovesCalculator(board, myPosition);
+            Set<ChessMove> validMoves = new HashSet<>(rookValidMoves.calculateValidMoves());
+            validMoves.addAll(bishopMovesCalculator.calculateValidMoves());
+            return validMoves;
         }
         if(getPieceType() == PieceType.KNIGHT) {
             KnightMovesCalculator validMoves = new KnightMovesCalculator(board, myPosition);
