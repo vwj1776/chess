@@ -67,7 +67,51 @@ public class BoardPrinter {
         };
     }
 
-    public static void highlight(ChessGame currentGame, ChessGame.TeamColor teamColor, ChessPosition position, Collection<ChessMove> legalMoves) {
-        
+    public static void highlight(ChessGame currentGame, ChessGame.TeamColor teamColor, ChessPosition selectedPos, Collection<ChessMove> legalMoves) {
+        ChessBoard board = currentGame.getBoard();
+
+        int rowStart = (teamColor == ChessGame.TeamColor.WHITE) ? 8 : 1;
+        int rowEnd = (teamColor == ChessGame.TeamColor.WHITE) ? 0 : 9;
+        int rowStep = (teamColor == ChessGame.TeamColor.WHITE) ? -1 : 1;
+
+        int colStart = (teamColor == ChessGame.TeamColor.WHITE) ? 1 : 8;
+        int colEnd = (teamColor == ChessGame.TeamColor.WHITE) ? 9 : 0;
+        int colStep = (teamColor == ChessGame.TeamColor.WHITE) ? 1 : -1;
+
+        String header = (teamColor == ChessGame.TeamColor.WHITE)
+                ? "   a  b  c  d  e  f  g  h"
+                : "   h  g  f  e  d  c  b  a";
+        System.out.println(header);
+
+        // Track legal target positions
+        var highlightTargets = legalMoves.stream().map(ChessMove::getEndPosition).toList();
+
+        for (int row = rowStart; row != rowEnd; row += rowStep) {
+            System.out.print(row + " ");
+            for (int col = colStart; col != colEnd; col += colStep) {
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(pos);
+
+                boolean isLightSquare = (row + col) % 2 != 0;
+                String bgColor = EscapeSequences.SET_BG_COLOR_LIGHT_GREY;
+                if (!isLightSquare) {
+                    bgColor = EscapeSequences.SET_BG_COLOR_DARK_GREY;
+                }
+
+                // Override background if selected or target
+                if (pos.equals(selectedPos)) {
+                    bgColor = EscapeSequences.SET_BG_COLOR_YELLOW;
+                } else if (highlightTargets.contains(pos)) {
+                    bgColor = EscapeSequences.SET_BG_COLOR_GREEN;
+                }
+
+                String symbol = getSymbol(piece);
+                System.out.print(bgColor + symbol + EscapeSequences.RESET_BG_COLOR);
+            }
+            System.out.println(" " + row);
+        }
+
+        System.out.println(header);
     }
+
 }

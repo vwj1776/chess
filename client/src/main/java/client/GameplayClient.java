@@ -1,8 +1,16 @@
 package client;
 
 import chess.*;
+import com.google.gson.Gson;
+import responsesandexceptions.ResponseException;
+import server.WebSocketHandler;
 import ui.BoardPrinter;
+import websocket.messages.ServerMessage;
 
+import javax.websocket.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Scanner;
 
 public class GameplayClient implements UIClient {
@@ -11,6 +19,9 @@ public class GameplayClient implements UIClient {
     private final String authToken;
     private final int gameId;
     private final ChessGame.TeamColor teamColor;
+    private NotificationHandler notificationHandler;
+    Session session;
+
     private ChessGame currentGame;
 
     public GameplayClient(ServerFacade server, ChessClient mainClient, String authToken, int gameId, ChessGame.TeamColor teamColor, ChessGame game) throws Exception {
@@ -20,6 +31,38 @@ public class GameplayClient implements UIClient {
         this.gameId = gameId;
         this.teamColor = teamColor;
         redrawBoard();
+    }
+
+    @OnMessage
+    public void onMessage(){
+
+    }
+
+    public void Web(String url, NotificationHandler notificationHandler) throws ResponseException {
+        try {
+            url = url.replace("http", "ws");
+            URI socketURI = new URI(url + "/ws");
+            this.notificationHandler = notificationHandler;
+
+            WebSocketContainer container = ContainerProvider.getWebSocketContainer();
+            this.session = container.connectToServer(this, socketURI);
+
+            //set message handler
+            this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+                @Override
+                public void onMessage(String message) {
+                    String notification = new Gson().fromJson(message, String.class);
+                    notificationHandler.notify(notification);
+                }
+            });
+        } catch (DeploymentException | IOException | URISyntaxException ex) {
+            throw new ResponseException(500, ex.getMessage());
+        }
+    }
+
+    //Endpoint requires this method, but you don't have to do anything
+
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
     @Override
@@ -55,13 +98,15 @@ public class GameplayClient implements UIClient {
     private String redrawBoard() throws Exception {
         currentGame = server.getGame(String.valueOf(gameId), authToken);
         BoardPrinter.draw(currentGame, teamColor);
-        return "Board redrawn.";
+        return "Board redrawn." + currentGame.getTeamTurn();
     }
 
-    private String leave() {
+    private String leave() throws Exception {
+        server.leaveGame(authToken, gameId);
         mainClient.promoteToPostLogin();
         return "You have left the game.";
     }
+
 
     private String makeMove() throws Exception {
         Scanner scanner = new Scanner(System.in);
@@ -86,13 +131,16 @@ public class GameplayClient implements UIClient {
             return "not your piece";
         }
 
+
         ChessPosition to = new ChessPosition(endRow, endCol);
         ChessMove move = new ChessMove(from, to, null);
 
         server.makeMove(authToken, gameId, move);
+        currentGame.makeMove(move);
         currentGame = server.getGame(String.valueOf(gameId), authToken);
+
         BoardPrinter.draw(currentGame, teamColor);
-        return "Move made.";
+        return "Move made." + currentGame.getTeamTurn();
     }
 
     private int letterToColumn(String letter) throws IllegalArgumentException {

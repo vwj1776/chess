@@ -133,8 +133,8 @@ public class PostLoginClient implements UIClient {
             String actualGameId = String.valueOf(lastListedGames.get(gameIndex - 1).gameID());
 
             server.observeGame(actualGameId, authToken);
-            // TODO: fetch game from server or database
-            ChessGame game = new ChessGame();
+
+            ChessGame game = server.getGame(actualGameId, authToken);
 
             ChessGame.TeamColor teamColor = ChessGame.TeamColor.valueOf("WHITE");
             BoardPrinter.draw(game, teamColor);

@@ -1,12 +1,20 @@
-login theo theo
-creategame test
+
+register a a a@poop
+login a a
+creategame test6
 listgames
-joingame 16 white
+joingame 6 white
+
+
 makemove
 2 a
 4 a
+
+
 highlight
 4 a
 leave
 logout
 quit
+
+login a a

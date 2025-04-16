@@ -36,4 +36,6 @@ public class WSClient extends Endpoint {
 
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
+
+
 }

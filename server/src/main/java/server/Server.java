@@ -18,6 +18,7 @@ import java.util.*;
 public class Server {
     private ChessService service;
     public int port;
+    private WebSocketHandler webSocketHandler;
 
 
     private final DataAccess dataAccess;
@@ -329,7 +330,7 @@ public class Server {
     private void runningAllEndpoints() {
         Spark.post("/user", this::addUser);
         Spark.get("/user/:username", this::getUser);
-
+        Spark.webSocket("/ws", webSocketHandler);
         Spark.post("/session", this::session);
         Spark.delete("/session", this::logout);
 

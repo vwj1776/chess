@@ -305,13 +305,11 @@ public class UserDataBaseAccess implements DataAccess {
 
     @Override
     public boolean joinGame(String authToken, String gameID, String playerColor) throws ResponseException {
-        System.out.println("join game");
+        System.out.println("join game ----- " + gameID + playerColor);
+        System.out.println("join game ----- " + playerColor);
 
         Set<GameData> gameDataList = ChessService.ALL_GAME_DATA;
-        GameData gameData = gameDataList.stream()
-                .filter(g -> g.gameID() == Integer.parseInt(gameID))
-                .findFirst()
-                .orElse(null);
+
 
         if (!playerColor.equalsIgnoreCase("WHITE") && !playerColor.equalsIgnoreCase("BLACK")) {
             throw new IllegalArgumentException("Invalid player color: " + playerColor);
@@ -330,11 +328,20 @@ public class UserDataBaseAccess implements DataAccess {
                 throw new ResponseException(403, "Color already taken");
             }
 
+
+            boolean updatePlayerColor = updatePlayerColor(conn, column, username, gameID);
+            ChessService.ALL_GAME_DATA.clear();
+            ChessService.ALL_GAME_DATA.addAll(listGames(authToken));
+
+            GameData gameData = gameDataList.stream()
+                    .filter(g -> g.gameID() == Integer.parseInt(gameID))
+                    .findFirst()
+                    .orElse(null);
             System.out.println(gameID + " outside");
             System.out.println(playerColor + " outside");
             System.out.println(gameData + " outside");
-
-            return updatePlayerColor(conn, column, username, gameID);
+            System.out.println(getGame(Integer.valueOf(gameID)).getTeamTurn());
+            return updatePlayerColor;
         } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, "Unable to join game: " + e.getMessage());
         }
