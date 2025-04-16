@@ -352,14 +352,14 @@ public class UserDataBaseAccess implements DataAccess {
 //                                System.out.println("in gamedata");
 //                                throw new ResponseException(403, "Color already taken");
 //                            }
-                            if (playerStillConnected) {
-                                System.out.println("in playerStillConnected");
+//                            if (playerStillConnected) {
+//                                System.out.println("in playerStillConnected");
+//
+//                                throw new ResponseException(403, "Color already taken");
+//                            }
 
-                                throw new ResponseException(403, "Color already taken");
-                            }
 
-
-                            // throw new ResponseException(403, "Color already taken");
+                            throw new ResponseException(403, "Color already taken");
 
                         }
 
