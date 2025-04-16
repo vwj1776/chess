@@ -272,6 +272,8 @@ public class Server {
 
     private Object makeMove(Request req, Response res) {
         try {
+            System.out.println("Request Body: " + req.body());
+
             String authToken = req.headers("Authorization");
             JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();
 
@@ -281,10 +283,21 @@ public class Server {
             }
 
             int gameId = body.get("gameID").getAsInt();
-            JsonObject moveJson = body.get("move").getAsJsonObject();
+            JsonObject moveJson = body.getAsJsonObject("move");
 
-            JsonObject fromJson = moveJson.get("start").getAsJsonObject();
-            JsonObject toJson = moveJson.get("end").getAsJsonObject();
+            if (!moveJson.has("startPosition") || !moveJson.has("endPosition")) {
+                res.status(400);
+                return new Gson().toJson(Map.of("message", "Missing move start/end fields"));
+            }
+
+            JsonObject fromJson = moveJson.getAsJsonObject("startPosition");
+            JsonObject toJson = moveJson.getAsJsonObject("endPosition");
+
+
+            if (!fromJson.has("row") || !fromJson.has("col") || !toJson.has("row") || !toJson.has("col")) {
+                res.status(400);
+                return new Gson().toJson(Map.of("message", "Missing move coordinates"));
+            }
 
             int fromRow = fromJson.get("row").getAsInt();
             int fromCol = fromJson.get("col").getAsInt();

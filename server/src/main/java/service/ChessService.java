@@ -121,6 +121,48 @@ public class ChessService {
         return resignedGames.contains(gameId);
     }
 
-    public void makeMove(String authToken, int gameId, ChessMove move) {
+    public void makeMove(String authToken, int gameId, ChessMove move) throws ResponseException {
+        // 1. Validate the auth token
+        if (!validateAuthToken(authToken)) {
+            throw new ResponseException(401, "Invalid auth token");
+        }
+
+        // 2. Get the game
+        ChessGame game = getGame(gameId);
+        if (game == null) {
+            throw new ResponseException(404, "Game not found");
+        }
+
+        // 3. Check if the game is over
+        if (isGameResigned(gameId) || game.getGameOver()) {
+            throw new ResponseException(403, "Game is already over");
+        }
+
+        // 4. Get the user's team color
+        GameData gameData = ALL_GAME_DATA.stream()
+                .filter(g -> g.gameID() == gameId)
+                .findFirst()
+                .orElseThrow(() -> new ResponseException(404, "Game data not found"));
+
+        ChessGame.TeamColor playerColor = getPlayerColor(authToken, gameData);
+        if (playerColor == null) {
+            throw new ResponseException(403, "Observers cannot make moves");
+        }
+
+        // 5. Check if it's the user's turn
+        if (game.getTeamTurn() != playerColor) {
+            throw new ResponseException(403, "Not your turn");
+        }
+
+        // 6. Attempt the move
+        try {
+            game.makeMove(move);
+        } catch (Exception e) {
+            throw new ResponseException(400, "Invalid move: " + e.getMessage());
+        }
+
+        // 7. Save the game back to the database
+        saveGame(gameId, game);
     }
+
 }
