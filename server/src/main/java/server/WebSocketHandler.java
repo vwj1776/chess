@@ -93,11 +93,25 @@ public class WebSocketHandler {
 
         try {
             String username = service.getUsernameFromAuth(connection.authToken);
+            GameData gameData = service.listGames(connection.authToken).stream()
+                    .filter(g -> g.gameID() == gameId)
+                    .findFirst()
+                    .orElseThrow(() -> new ResponseException(400, "Game not found"));
+
+            if (username.equals(gameData.whiteUsername())) {
+                service.dataAccess.clearPlayerSlot(gameId, "white");
+            } else if (username.equals(gameData.blackUsername())) {
+                service.dataAccess.clearPlayerSlot(gameId, "black");
+            }
+
             broadcastMessageExcept(gameId, ServerMessage.notification(username + " left the game"), session);
+
         } catch (Exception e) {
             sendError(session, "Error on leave: " + e.getMessage());
         }
     }
+
+
 
 
     private void handleResign(Session session) {

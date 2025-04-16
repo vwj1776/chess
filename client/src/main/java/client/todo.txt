@@ -1,12 +1,1 @@
-make register and everything easier to type
-- like r, or autocorrect.
-print no games if no games
-
-- validate gameid
-- print board from white objective
-better error messages
-
-fix board tones for both joins, queen on d^^ check
-observe after join needs to work. ^^ check
-shift over abc over as one ^^ check
-make the error pretty for the human, make it red and stuff UI ^^
+leave game needs to update the database to have a null username

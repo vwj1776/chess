@@ -227,5 +227,10 @@ public class MemoryDataAccess implements DataAccess {
 
     }
 
+    @Override
+    public void clearPlayerSlot(int gameId, String white) throws DataAccessException {
+
+    }
+
 
 }

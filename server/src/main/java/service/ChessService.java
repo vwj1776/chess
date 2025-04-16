@@ -16,7 +16,7 @@ import java.util.Set;
 
 
 public class ChessService {
-    private final DataAccess dataAccess;
+    public final DataAccess dataAccess;
 
     private final HashMap<String, UserData> users = new HashMap<>();
     private final Set<Integer> resignedGames = new HashSet<>();
@@ -109,6 +109,8 @@ public class ChessService {
             return null;
         }
     }
+
+
 
     public void resignGame(int gameId) {
         resignedGames.add(gameId);

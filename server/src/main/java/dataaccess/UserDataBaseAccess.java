@@ -439,5 +439,24 @@ public class UserDataBaseAccess implements DataAccess {
         }
     }
 
+    public void clearPlayerSlot(int gameId, String color) throws DataAccessException {
+        String column = switch (color.toLowerCase()) {
+            case "white" -> "whiteUsername";
+            case "black" -> "blackUsername";
+            default -> throw new IllegalArgumentException("Invalid color: " + color);
+        };
+
+        try (var conn = DatabaseManager.getConnection()) {
+            String update = "UPDATE GameData SET " + column + " = NULL WHERE gameID = ?";
+            try (var ps = conn.prepareStatement(update)) {
+                ps.setInt(1, gameId);
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Failed to clear player slot", e);
+        }
+    }
+
+
 
 }
