@@ -1,5 +1,6 @@
 package server;
 
+import chess.ChessMove;
 import responsesandexceptions.DataAccessException;
 import responsesandexceptions.ResponseException;
 import responsesandexceptions.UserResponse;
@@ -269,6 +270,49 @@ public class Server {
         return Spark.port();
     }
 
+    private Object makeMove(Request req, Response res) {
+        try {
+            String authToken = req.headers("Authorization");
+            JsonObject body = JsonParser.parseString(req.body()).getAsJsonObject();
+
+            if (body.get("gameID") == null || body.get("move") == null) {
+                res.status(400);
+                return new Gson().toJson(Map.of("message", "Missing required fields"));
+            }
+
+            int gameId = body.get("gameID").getAsInt();
+            JsonObject moveJson = body.get("move").getAsJsonObject();
+
+            JsonObject fromJson = moveJson.get("start").getAsJsonObject();
+            JsonObject toJson = moveJson.get("end").getAsJsonObject();
+
+            int fromRow = fromJson.get("row").getAsInt();
+            int fromCol = fromJson.get("col").getAsInt();
+            int toRow = toJson.get("row").getAsInt();
+            int toCol = toJson.get("col").getAsInt();
+
+            String promo = moveJson.has("promotion") && !moveJson.get("promotion").isJsonNull()
+                    ? moveJson.get("promotion").getAsString()
+                    : null;
+
+            var move = new ChessMove(
+                    new chess.ChessPosition(fromRow, fromCol),
+                    new chess.ChessPosition(toRow, toCol),
+                    promo == null ? null : chess.ChessPiece.PieceType.valueOf(promo)
+            );
+
+            service.makeMove(authToken, gameId, move);
+
+            res.status(200);
+            return "{}";
+
+        } catch (Exception e) {
+            res.status(500);
+            return new Gson().toJson(Map.of("message", "Error: " + e.getMessage()));
+        }
+    }
+
+
     private void runningAllEndpoints() {
         Spark.post("/user", this::addUser);
         Spark.get("/user/:username", this::getUser);
@@ -280,6 +324,9 @@ public class Server {
         Spark.get("/game", this::listGames);
         Spark.put("/game", this::joinGame);
         Spark.delete("/db", this::clear);
+
+        Spark.put("/game/move", this::makeMove);
+
     }
 
 

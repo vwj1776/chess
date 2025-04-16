@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessMove;
 import dataaccess.DataAccess;
 import responsesandexceptions.DataAccessException;
 import responsesandexceptions.ResponseException;
@@ -120,4 +121,6 @@ public class ChessService {
         return resignedGames.contains(gameId);
     }
 
+    public void makeMove(String authToken, int gameId, ChessMove move) {
+    }
 }

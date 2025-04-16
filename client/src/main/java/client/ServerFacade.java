@@ -121,8 +121,16 @@ public class ServerFacade {
         }
     }
 
-    public void makeMove(String authToken, Integer currentGameId, ChessMove move) {
+    public void makeMove(String authToken, Integer gameId, ChessMove move) throws ResponseException {
+        var request = Map.of(
+                "gameID", String.valueOf(gameId),
+                "move", move
+        );
+
+        var headers = Map.of("Authorization", authToken);
+        makeRequest("PUT", "/game/move", request, headers, Void.class);
     }
+
 
     public void resignGame(String authToken, int gameId) {
     }
